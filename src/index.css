@@ -94,9 +94,22 @@ header .shop-cart h2 {
   margin-bottom: 10px;
 }
 
-header .shop-cart .item p {
+header .shop-cart .item b {
   color: #797979;
   font-weight: 600;
+}
+
+header .shop-cart .item .delete-icon {
+  float: right;
+  position: relative;
+  top: -15px;
+  cursor: pointer;
+  transition: color, transform 300ms ease;
+}
+
+header .shop-cart .item .delete-icon:hover {
+  color: #d83030;
+  transform: scale(1.2);
 }
 
 header ul.nav li {
@@ -108,6 +121,14 @@ header ul.nav li {
 
 header ul.nav li:hover {
   opacity: 0.5;
+}
+
+header .shop-cart .sum {
+  float: left;
+  width: 100%;
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 20px;
 }
 
 header .presentation::after {
