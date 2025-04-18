@@ -1,15 +1,16 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Items from "./components/items";
 import Catagories from "./components/Catagories";
 import ShowFullItem from "./components/ShowFullItem";
+import Register from "./components/Register";
+import { withRouter } from "./components/withRouter"; 
 
-
-//remake so that when adding an image to the database, each image is named according to its category + number + 1
-class App extends React.Component{
-  constructor(props){
-    super(props)
+class App extends React.Component {
+  constructor(props) {
+    super(props);
     this.state = {
       orders: [],
       currentItems: [],
@@ -33,58 +34,87 @@ class App extends React.Component{
       ],
       showFullItem: false,
       fullItem: {}
+    };
+    this.addToOrder = this.addToOrder.bind(this);
+    this.deleteOrder = this.deleteOrder.bind(this);
+    this.chooseCategory = this.chooseCategory.bind(this);
+    this.onShowItem = this.onShowItem.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({ currentItems: this.state.items });
+  }
+
+  deleteOrder(id) {
+    this.setState({ orders: this.state.orders.filter(el => el.id !== id) });
+  }
+
+  addToOrder(item) {
+    if (!this.state.orders.some(el => el.id === item.id)) {
+      this.setState({ orders: [...this.state.orders, item] });
     }
-    this.state.currentItems = this.state.items
-    this.addToOrder = this.addToOrder.bind(this)
-    this.deleteOrder = this.deleteOrder.bind(this)
-    this.chooseCategory = this.chooseCategory.bind(this)
-    this.onShowItem = this.onShowItem.bind(this)
-  }
-  render () {
-    return (
-      <div className="wrapper">
-        <Header orders={this.state.orders} onDelete={this.deleteOrder}/>
-        <Catagories chooseCategory={this.chooseCategory}/>
-        <Items onShowItem={this.onShowItem} items={this.state.currentItems} onAdd = {this.addToOrder}/>
-        {this.state.showFullItem && <ShowFullItem onAdd = {this.addToOrder} onShowItem={this.onShowItem} item ={this.state.fullItem}/>}
-        <Footer />
-      </div>
-    );
-  }
-
-
-  onShowItem(item) {
-    this.setState({fullItem: item})
-    this.setState({showFullItem: !this.state.showFullItem})
   }
 
   chooseCategory(category) {
-    if (category === 'all'){
-      this.setState({currentItems: this.state.items})
-      return
+    if (category === 'all') {
+      this.setState({ currentItems: this.state.items });
+    } else {
+      this.setState({
+        currentItems: this.state.items.filter(el => el.category === category)
+      });
     }
-    
-    this.setState({
-      currentItems: this.state.items.filter(el => el.category === category)
-    })
   }
 
-//change this after addint database
-  deleteOrder(id) {
-    this.setState({orders: this.state.orders.filter(el => el.id !== id)})
+  onShowItem(item) {
+    this.setState({ fullItem: item, showFullItem: !this.state.showFullItem });
   }
 
+  render() {
+    const { location } = this.props.router;
+    const isRegisterPage = location.pathname === "/register";
 
-  //add a number of item wright in the box like (x2)
-  addToOrder(item) {
-    let isInArray = false
-    this.state.orders.forEach(el => {
-      if (el.id === item.id)
-        isInArray = true
-    })
-    if(!isInArray)
-      this.setState({ orders: [...this.state.orders, item]})
+    return (
+      <div className="wrapper">
+        {!isRegisterPage && (
+          <Header orders={this.state.orders} onDelete={this.deleteOrder} />
+        )}
+
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <Catagories chooseCategory={this.chooseCategory} />
+                <Items
+                  onShowItem={this.onShowItem}
+                  items={this.state.currentItems}
+                  onAdd={this.addToOrder}
+                />
+                {this.state.showFullItem && (
+                  <ShowFullItem
+                    onAdd={this.addToOrder}
+                    onShowItem={this.onShowItem}
+                    item={this.state.fullItem}
+                  />
+                )}
+              </>
+            }
+          />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+
+        {!isRegisterPage && <Footer />}
+      </div>
+    );
   }
 }
 
-export default App;
+const AppWithRouter = withRouter(App);
+
+const AppWrapper = () => (
+  <Router>
+    <AppWithRouter />
+  </Router>
+);
+
+export default AppWrapper;

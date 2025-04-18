@@ -6,6 +6,78 @@
   padding: 0;
 }
 
+/* Registration */
+.register-wrapper {
+  position: relative; /* для позиционирования кнопки */
+  max-width: 400px;
+  margin: 150px auto;
+}
+
+.register-form {
+  width: 100%;
+  padding: 40px;
+  background: #f9f9f9;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  text-align: center;
+  box-sizing: border-box; /* ← исправляет "вылезание" полей */
+}
+
+.register-form h2 {
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.register-form input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box; /* ← тоже важно */
+}
+
+.register-form button {
+  padding: 12px 25px;
+  background-color: black;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.register-form button:hover {
+  background-color: #333;
+}
+
+.back-button {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: #f9f9f9;
+  color: black;
+  opacity: 0.5;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity, background-color 0.5s ease;
+}
+
+.back-button:hover {
+  opacity: 1;
+  background-color: #f1f1f1;
+}
+
+.back-icon {
+  font-size: 20px;
+}
+
+
+
 body {
   background: #fff;
   color: #222;
@@ -43,6 +115,15 @@ header ul.nav {
   float: right;
   list-style: 20px;
 
+}
+
+.nav a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav a:focus {
+  outline: none;
 }
 
 header .shop-cart-button {

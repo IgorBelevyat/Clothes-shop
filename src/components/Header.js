@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { FaShoppingCart } from "react-icons/fa";
 import Order from './Order';
+import { Link } from 'react-router-dom'
 
 const showOrders = (props) => {
   let sum = 0
@@ -28,9 +29,10 @@ export default function Header(props) {
         <div>
             <span className='logo'>Clothing store</span>
             <ul className='nav'>
-                <li>About us</li>
-                <li>Contacts</li>
-                <li>My cabinet</li>
+              <li>About us</li>
+              <li>Contacts</li>
+              <li>My cabinet</li>
+              <li><Link to="/register">Register</Link></li>
             </ul>
             <FaShoppingCart onClick={() => setCartOpen(cartOpen = !cartOpen)} className={`shop-cart-button ${cartOpen && 'active'}`}/>
 
