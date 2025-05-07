@@ -1,17 +1,27 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
-export class item extends Component {
+export class Item extends Component {
   render() {
+    const { item, onShowItem, onAdd } = this.props;
     return (
-      <div className='item'>
-        <img src={"./img/" + this.props.item.img} alt='product' onClick={() => this.props.onShowItem(this.props.item)}/>
-        <h2>{this.props.item.title}</h2>
-        <p>{this.props.item.desc}</p>
-        <b>{this.props.item.price}$</b>
-        <div className='add-to-cart' onClick={() => this.props.onAdd(this.props.item)}>+</div>
+      <div className='item-card'>
+        <img
+          className='item-image'
+          src={item.image}
+          alt='product'
+          onClick={() => onShowItem(item)}
+        />
+        <div className='item-content'>
+          <h2 className='item-title'>{item.title}</h2>
+          <p className='item-desc'>{item.description}</p>
+          <div className='item-bottom'>
+            <b className='item-price'>{item.price}$</b>
+            <button className='item-button' onClick={() => onAdd(item)}>Добавить</button>
+          </div>
+        </div>
       </div>
-    )
+    );
   }
 }
 
-export default item;
+export default Item;

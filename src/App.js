@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
@@ -6,7 +7,10 @@ import Items from "./components/items";
 import Catagories from "./components/Catagories";
 import ShowFullItem from "./components/ShowFullItem";
 import Register from "./components/Register";
-import { withRouter } from "./components/withRouter"; 
+import Login from "./components/Login";
+import CMS from './components/CMS';
+import UserCabinet from './components/UserCabinet';
+import { withRouter } from "./components/withRouter";
 
 class App extends React.Component {
   constructor(props) {
@@ -14,35 +18,61 @@ class App extends React.Component {
     this.state = {
       orders: [],
       currentItems: [],
-      items: [
-        {
-          id: 1,
-          title: 'T-short',
-          img: 'T-short.jpg',
-          desc: 'Lorem ipsum dolor',
-          category: 'T-shorts',
-          price: '49.58'
-        },
-        {
-          id: 2,
-          title: 'Hoodi',
-          img: 'hoodie.jpg',
-          desc: 'Lorem ipsum dolor',
-          category: 'Hoodies',
-          price: '149.58'
-        }
-      ],
+      items: [],
+      categories: [],
       showFullItem: false,
-      fullItem: {}
+      fullItem: {},
+      user: null,
     };
+
     this.addToOrder = this.addToOrder.bind(this);
     this.deleteOrder = this.deleteOrder.bind(this);
     this.chooseCategory = this.chooseCategory.bind(this);
     this.onShowItem = this.onShowItem.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
   }
 
   componentDidMount() {
-    this.setState({ currentItems: this.state.items });
+
+    fetch('http://localhost:3001/api/products')
+      .then(res => res.json())
+      .then(data => this.setState({ items: data, currentItems: data }));
+
+
+    fetch('http://localhost:3001/api/categories')
+      .then(res => res.json())
+      .then(data => this.setState({ categories: data }));
+
+
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        this.setState({ user: JSON.parse(savedUser) });
+        fetch('http://localhost:3001/api/me', { credentials: 'include' })
+          .then(res => { if (!res.ok) this.setState({ user: null }); });
+      } catch (e) {
+        localStorage.removeItem('user');
+      }
+    } else {
+      fetch('http://localhost:3001/api/me', { credentials: 'include' })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data) {
+            this.setState({ user: data });
+            localStorage.setItem('user', JSON.stringify(data));
+          }
+        });
+    }
+  }
+
+  handleLogout() {
+    this.setState({ user: null });
+    localStorage.removeItem('user');
+    fetch('http://localhost:3001/api/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
   }
 
   deleteOrder(id) {
@@ -69,14 +99,28 @@ class App extends React.Component {
     this.setState({ fullItem: item, showFullItem: !this.state.showFullItem });
   }
 
+  handleLogin(user) {
+    this.setState({ user });
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
   render() {
     const { location } = this.props.router;
-    const isRegisterPage = location.pathname === "/register";
+    const isAuthPage = location.pathname === "/register" || location.pathname === "/login";
+    const isCmsPage = location.pathname === "/cms";
+    const shouldShowHeader = !isAuthPage;
+    const shouldShowBanner = !isAuthPage && !isCmsPage;
 
     return (
       <div className="wrapper">
-        {!isRegisterPage && (
-          <Header orders={this.state.orders} onDelete={this.deleteOrder} />
+        {shouldShowHeader && (
+          <Header
+            orders={this.state.orders}
+            onDelete={this.deleteOrder}
+            user={this.state.user}
+            onLogout={this.handleLogout}
+            showBanner={shouldShowBanner}
+          />
         )}
 
         <Routes>
@@ -84,7 +128,10 @@ class App extends React.Component {
             path="/"
             element={
               <>
-                <Catagories chooseCategory={this.chooseCategory} />
+                <Catagories
+                  chooseCategory={this.chooseCategory}
+                  categories={this.state.categories}
+                />
                 <Items
                   onShowItem={this.onShowItem}
                   items={this.state.currentItems}
@@ -101,9 +148,12 @@ class App extends React.Component {
             }
           />
           <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login onLogin={this.handleLogin} />} />
+          <Route path="/cabinet" element={<UserCabinet user={this.state.user} orders={this.state.orders} onLogout={this.handleLogout} />} />
+          <Route path="/cms" element={<CMS user={this.state.user} />} />
         </Routes>
 
-        {!isRegisterPage && <Footer />}
+        {!isAuthPage && <Footer />}
       </div>
     );
   }

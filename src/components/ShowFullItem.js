@@ -1,19 +1,26 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
 export class ShowFullItem extends Component {
   render() {
+    const { item, onShowItem, onAdd } = this.props;
+
     return (
       <div className='full-item'>
-        <div>
-            <img src={"./img/" + this.props.item.img} alt='product' onClick={() => this.props.onShowItem(this.props.item)}/>
-            <h2>{this.props.item.title}</h2>
-            <p>{this.props.item.desc}</p>
-            <b>{this.props.item.price}$</b>
-            <div className='add-to-cart' onClick={() => this.props.onAdd(this.props.item)}>+</div>
+        <div className='full-card'>
+          <button className='back-button' onClick={() => onShowItem(item)}>
+            ← Назад
+          </button>
+          <img className='full-image' src={item.image} alt='product' />
+          <div className='full-info'>
+            <h2>{item.title}</h2>
+            <p>{item.description}</p>
+            <b>{item.price}$</b>
+            <button className='item-button' onClick={() => onAdd(item)}>Добавить в корзину</button>
+          </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default ShowFullItem
+export default ShowFullItem;
