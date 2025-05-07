@@ -7,32 +7,32 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-section">
-          <h3>О нас</h3>
+          <h3>About us</h3>
           <p>
-            Clothing Store — онлайн-магазин стильной одежды. Мы предлагаем лучшие коллекции для повседневной и особенной жизни.
+            Clothing Store — online store of stylish clothes. We offer the best collections for everyday and special life.
           </p>
         </div>
 
         <div className="footer-section">
-          <h3>Контакты</h3>
+          <h3>Contactacts</h3>
           <p>Email: contact@clothingstore.com</p>
-          <p>Телефон: +38 (063) 123-45-67</p>
-          <p>Адрес: Киев, ул. Шопінгова, 12</p>
+          <p>Telephone: +38 (063) 123-45-67</p>
+          <p>Addres: Kyiv, Shoping street, 12</p>
         </div>
 
         <div className="footer-section">
-          <h3>Информация</h3>
+          <h3>Information</h3>
           <ul>
-          <li><a href="/about">О компании</a></li>
-          <li><a href="/delivery">Доставка и оплата</a></li>
-          <li><a href="/warranty">Гарантия и возврат</a></li>
-          <li><a href="/privacy-policy">Политика конфиденциальности</a></li>
+          <li><a href="/about">About company</a></li>
+          <li><a href="/delivery">Delivery and payment</a></li>
+          <li><a href="/warranty">Warranty and returns</a></li>
+          <li><a href="/privacy-policy">Privacy Policy</a></li>
         </ul>
 
         </div>
       </div>
       <div className="footer-bottom">
-        © {new Date().getFullYear()} Clothing Store. Все права защищены.
+        © {new Date().getFullYear()} Clothing Store. All rights reserved.
       </div>
     </footer>
   );

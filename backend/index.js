@@ -167,6 +167,8 @@ app.post('/api/logout', (req, res) => {
   res.json({ message: 'Logged out successfully' });
 });
 
+//categories
+
 app.get('/api/categories', async (req, res) => {
   try {
     const categoryTree = await getCategoryTree();
