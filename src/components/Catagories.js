@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 function Categories({ categories: initialCategories, chooseCategory }) {
   const [columns, setColumns] = useState([]);
   const [selectedPath, setSelectedPath] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (initialCategories && initialCategories.length > 0) {
@@ -13,6 +14,10 @@ function Categories({ categories: initialCategories, chooseCategory }) {
     }
     setSelectedPath([]);
   }, [initialCategories]);
+
+  const toggleMenu = () => {
+    setMenuOpen(prev => !prev);
+  };
 
   const handleCategoryItemClick = (item, columnIndex) => {
     let newSelectedPathIds;
@@ -32,7 +37,7 @@ function Categories({ categories: initialCategories, chooseCategory }) {
         const childrenOfItem = [
           {
             id: `all-models-${item.id}`,
-            name: `Усі моделі ${item.name}`,
+            name: `All models ${item.name}`,
             isAllModelsOption: true,
             parentCategoryId: item.id,
             parentCategoryName: item.name,
@@ -61,45 +66,51 @@ function Categories({ categories: initialCategories, chooseCategory }) {
   };
 
   if (!initialCategories) {
-    return <div className="flyout-categories-outer-container">Завантаження категорій...</div>;
+    return <div className="flyout-categories-outer-container">Loading categoris...</div>;
   }
 
   return (
-    <div className="flyout-categories-outer-container"> 
-      <div
-        className={`flyout-category-item flyout-global-all-item ${selectedPath.length === 0 ? 'active' : ''}`} 
-        onClick={handleGlobalAllCategoriesClick}
-      >
-        Усі категорії
-      </div>
-      <div className="flyout-columns-wrapper"> 
-        {columns.map((columnItems, columnIndex) => (
-          <div key={columnIndex} className="flyout-category-column"> 
-            {columnItems.map((item) => {
-              const itemIsActive =
-                !item.isAllModelsOption &&
-                selectedPath[columnIndex] === item.id &&
-                columns[columnIndex + 1] &&
-                columns[columnIndex + 1][0] &&
-                columns[columnIndex + 1][0].isAllModelsOption &&
-                columns[columnIndex + 1][0].parentCategoryId === item.id;
+    <div className="categories-container">
+      <button className="toggle-menu-button" onClick={toggleMenu}>
+        {menuOpen ? 'Close filters' : 'Filters'}
+      </button>
 
-              const hasArrow = !item.isAllModelsOption && item.children && item.children.length > 0;
-
-              return (
-                <div
-                  key={item.id}
-                  className={`flyout-category-item ${itemIsActive ? 'active' : ''} ${item.isAllModelsOption ? 'flyout-all-models-option' : ''}`} // Змінено та додано flyout-all-models-option
-                  onClick={() => handleCategoryItemClick(item, columnIndex)}
-                >
-                  <span>{item.name}</span>
-                  {hasArrow && <span className="flyout-arrow">&gt;</span>} 
-                </div>
-              );
-            })}
+      {menuOpen && (
+        <div className="flyout-categories-outer-container">
+          <div
+            className={`flyout-category-item flyout-global-all-item ${selectedPath.length === 0 ? 'active' : ''}`}
+            onClick={handleGlobalAllCategoriesClick}
+          >
+            All categories
           </div>
-        ))}
-      </div>
+          <div className="flyout-columns-wrapper">
+            {columns.map((columnItems, columnIndex) => (
+              <div key={columnIndex} className="flyout-category-column">
+                {columnItems.map((item) => {
+                  const itemIsActive =
+                    !item.isAllModelsOption &&
+                    selectedPath[columnIndex] === item.id &&
+                    columns[columnIndex + 1]?.[0]?.isAllModelsOption &&
+                    columns[columnIndex + 1]?.[0]?.parentCategoryId === item.id;
+
+                  const hasArrow = !item.isAllModelsOption && item.children?.length > 0;
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={`flyout-category-item ${itemIsActive ? 'active' : ''} ${item.isAllModelsOption ? 'flyout-all-models-option' : ''}`}
+                      onClick={() => handleCategoryItemClick(item, columnIndex)}
+                    >
+                      <span>{item.name}</span>
+                      {hasArrow && <span className="flyout-arrow">&gt;</span>}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
