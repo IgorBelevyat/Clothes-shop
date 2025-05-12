@@ -456,6 +456,7 @@ app.post('/api/upload', verifyToken, upload.single('image'), async (req, res) =>
   }
 });
 
+//For orders in future
 app.get('/api/orders', verifyToken, async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
