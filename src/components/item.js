@@ -16,7 +16,7 @@ export class Item extends Component {
           <p className='item-desc'>{item.description}</p>
           <div className='item-bottom'>
             <b className='item-price'>{item.price}$</b>
-            <button className='item-button' onClick={() => onAdd(item)}>Добавить</button>
+            <button className='item-button' onClick={() => onAdd(item)}>Add to cart</button>
           </div>
         </div>
       </div>
