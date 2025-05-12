@@ -1,10 +1,9 @@
-
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Items from "./components/items";
-import Catagories from "./components/Catagories";
+import Categories from "./components/Catagories"; 
 import ShowFullItem from "./components/ShowFullItem";
 import Register from "./components/Register";
 import Login from "./components/Login";
@@ -34,16 +33,15 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-
     fetch('http://localhost:3001/api/products')
       .then(res => res.json())
-      .then(data => this.setState({ items: data, currentItems: data }));
-
+      .then(data => this.setState({ items: data, currentItems: data }))
+      .catch(err => console.error("Error fetching products:", err));
 
     fetch('http://localhost:3001/api/categories')
       .then(res => res.json())
-      .then(data => this.setState({ categories: data }));
-
+      .then(data => this.setState({ categories: data }))
+      .catch(err => console.error("Error fetching categories:", err));
 
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -85,13 +83,55 @@ class App extends React.Component {
     }
   }
 
-  chooseCategory(category) {
-    if (category === 'all') {
+  chooseCategory(categoryName) {
+    if (categoryName === 'all') {
       this.setState({ currentItems: this.state.items });
     } else {
-      this.setState({
-        currentItems: this.state.items.filter(el => el.category === category)
-      });
+      if (this.state.items && this.state.items.length > 0) {
+        let selectedCategory = null;
+        const findCategoryByName = (categories, name) => {
+          for (let category of categories) {
+            if (category.name === name) {
+              return category;
+            }
+            if (category.children && category.children.length > 0) {
+              const found = findCategoryByName(category.children, name);
+              if (found) return found;
+            }
+          }
+          return null;
+        };
+        
+        selectedCategory = findCategoryByName(this.state.categories, categoryName);
+        
+        if (selectedCategory) {
+          const categoryIds = [selectedCategory.id];
+          const collectSubcategoryIds = (category) => {
+            if (category.children && category.children.length > 0) {
+              for (let child of category.children) {
+                categoryIds.push(child.id);
+                collectSubcategoryIds(child);
+              }
+            }
+          };
+          
+          collectSubcategoryIds(selectedCategory);
+          
+          this.setState({
+            currentItems: this.state.items.filter(el => 
+              el.category && categoryIds.includes(el.categoryId)
+            )
+          });
+        } else {
+          this.setState({
+            currentItems: this.state.items.filter(el => 
+              el.category && el.category.name === categoryName
+            )
+          });
+        }
+      } else {
+        this.setState({ currentItems: [] });
+      }
     }
   }
 
@@ -128,9 +168,9 @@ class App extends React.Component {
             path="/"
             element={
               <>
-                <Catagories
-                  chooseCategory={this.chooseCategory}
+                <Categories 
                   categories={this.state.categories}
+                  chooseCategory={this.chooseCategory}
                 />
                 <Items
                   onShowItem={this.onShowItem}
