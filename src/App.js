@@ -47,13 +47,13 @@ class App extends React.Component {
     if (savedUser) {
       try {
         this.setState({ user: JSON.parse(savedUser) });
-        fetch('http://localhost:3001/api/me', { credentials: 'include' })
+        fetch('http://localhost:3001/api/auth/me', { credentials: 'include' })
           .then(res => { if (!res.ok) this.setState({ user: null }); });
       } catch (e) {
         localStorage.removeItem('user');
       }
     } else {
-      fetch('http://localhost:3001/api/me', { credentials: 'include' })
+      fetch('http://localhost:3001/api/auth/me', { credentials: 'include' })
         .then(res => res.ok ? res.json() : null)
         .then(data => {
           if (data) {
@@ -67,7 +67,7 @@ class App extends React.Component {
   handleLogout() {
     this.setState({ user: null });
     localStorage.removeItem('user');
-    fetch('http://localhost:3001/api/logout', {
+    fetch('http://localhost:3001/api/auth/logout', {
       method: 'POST',
       credentials: 'include',
     });

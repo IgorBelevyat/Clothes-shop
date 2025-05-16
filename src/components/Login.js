@@ -16,7 +16,7 @@ export default function Login({ onLogin }) {
 
     try {
 
-      const loginResponse = await fetch('http://localhost:3001/api/login', {
+      const loginResponse = await fetch('http://localhost:3001/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -31,7 +31,7 @@ export default function Login({ onLogin }) {
       }
 
 
-      const userResponse = await fetch('http://localhost:3001/api/me', {
+      const userResponse = await fetch('http://localhost:3001/api/auth/me', {
         credentials: 'include',
       })
 

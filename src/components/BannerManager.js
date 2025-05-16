@@ -23,7 +23,7 @@ const BannerManager = () => {
   const fetchSlides = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/api/cms/banner', {
+      const response = await fetch('http://localhost:3001/api/banner/cms', {
         credentials: 'include' 
       });
       
@@ -110,13 +110,13 @@ const BannerManager = () => {
       let response;
       
       if (editMode && currentSlide) {
-        response = await fetch(`http://localhost:3001/api/cms/banner/${currentSlide.id}`, {
+        response = await fetch(`http://localhost:3001/api/banner/cms/${currentSlide.id}`, {
           method: 'PUT',
           credentials: 'include',
           body: formDataObj
         });
       } else {
-        response = await fetch('http://localhost:3001/api/cms/banner', {
+        response = await fetch('http://localhost:3001/api/banner/cms', {
           method: 'POST',
           credentials: 'include',
           body: formDataObj
@@ -142,7 +142,7 @@ const BannerManager = () => {
     }
     
     try {
-      const response = await fetch(`http://localhost:3001/api/cms/banner/${slideId}`, {
+      const response = await fetch(`http://localhost:3001/api/banner/cms/${slideId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -182,7 +182,7 @@ const BannerManager = () => {
     try {
       const slideIds = newSlides.map(slide => slide.id);
       
-      const response = await fetch('http://localhost:3001/api/cms/banner/reorder', {
+      const response = await fetch('http://localhost:3001/api/banner/cms/reorder', {
         method: 'POST',
         credentials: 'include',
         headers: {

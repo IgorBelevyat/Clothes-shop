@@ -15,7 +15,7 @@ export default function Register() {
     const registrationData = { firstName, lastName, email, password }
 
     try {
-      const response = await fetch('http://localhost:3001/api/register', {
+      const response = await fetch('http://localhost:3001/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(registrationData),
@@ -23,14 +23,14 @@ export default function Register() {
 
       if (response.ok) {
         const data = await response.json()
-        console.log('Успешная регистрация:', data)
+        console.log('Successful registration:', data)
         setSuccessMessage('Registration successful! You can now log in.')
       } else {
         const err = await response.json()
         alert(err.error || 'Something went wrong')
       }
     } catch (err) {
-      console.error('Ошибка:', err)
+      console.error('Error:', err)
       alert('Server error')
     }
   }
