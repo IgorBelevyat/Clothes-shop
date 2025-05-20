@@ -1,7 +1,9 @@
 const prisma = require('../config/prisma.client.js');
+const memoizeAsync = require('../services/memorization');
+
 
 // Вивести в сервіси 
-async function getCategoryTreeLocal() {
+const getCategoryTreeLocal = memoizeAsync(async () => {
   const allCategories = await prisma.category.findMany({
     orderBy: {
       name: 'asc',
@@ -26,7 +28,11 @@ async function getCategoryTreeLocal() {
     }
   });
   return rootCategories;
-}
+}, {
+  strategy: 'TTL',
+  ttl:60000,
+  maxSize: 1
+});
 
 async function isDescendantOfLocal(potentialDescendantId, ancestorId) {
   let category = await prisma.category.findUnique({
@@ -85,6 +91,7 @@ const createCategory = async (req, res, next) => {
         parentId: parentId ? parseInt(parentId) : null,
       },
     });
+    getCategoryTreeLocal.clear();
     res.status(201).json(newCategory);
   } catch (err) {
     next(err);
@@ -131,6 +138,7 @@ const updateCategory = async (req, res, next) => {
         parentId: newParentId,
       },
     });
+    getCategoryTreeLocal.clear();
     res.status(200).json(updatedCategory);
   } catch (err) {
     next(err);
@@ -188,6 +196,7 @@ const deleteCategory = async (req, res, next) => {
     await prisma.category.delete({
       where: { id: categoryId },
     });
+    getCategoryTreeLocal.clear();
     res.status(200).json({ message: 'Category successfully deleted' });
   } catch (err) {
     next(err);

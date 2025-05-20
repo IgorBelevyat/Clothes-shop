@@ -1,9 +1,9 @@
 function memoizeAsync(fn, {
   maxSize = Infinity,
-  strategy = 'LRU', // или 'LFU', 'TTL', 'custom'
+  strategy = 'LRU', 
   ttl = 0,
   customEvict = null
-} = {}) { //?
+} = {}) { 
   const cache = new Map();
   const usageOrder = new Map();
   const usageCount = new Map();
