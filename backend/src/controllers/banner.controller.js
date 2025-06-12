@@ -31,7 +31,7 @@ const createBannerSlide = async (req, res, next) => {
     return res.status(403).json({ error: 'Access denied' });
   }
   try {
-    const { title, subtitle, linkUrl, isActive } = req.body;
+    const { title, subtitle, linkUrl, linkText, isActive } = req.body;
     const imageUrl = req.file ? req.file.path : null;
 
     if (!imageUrl) {
@@ -50,6 +50,7 @@ const createBannerSlide = async (req, res, next) => {
         subtitle: subtitle || null,
         imageUrl,
         linkUrl: linkUrl || null,
+        linkText: linkText || null,
         isActive: isActive === 'true' || isActive === true,
         displayOrder
       }
@@ -77,7 +78,7 @@ const updateBannerSlide = async (req, res, next) => {
       return res.status(404).json({ error: 'Slide not found' });
     }
 
-    const { title, subtitle, linkUrl, isActive, displayOrder } = req.body;
+    const { title, subtitle, linkUrl, linkText, isActive, displayOrder } = req.body;
     const imageUrl = req.file ? req.file.path : undefined;
 
     const updatedSlide = await prisma.bannerSlide.update({
@@ -87,6 +88,7 @@ const updateBannerSlide = async (req, res, next) => {
         subtitle: subtitle === undefined ? slide.subtitle : subtitle || null,
         imageUrl: imageUrl || slide.imageUrl,
         linkUrl: linkUrl === undefined ? slide.linkUrl : linkUrl || null,
+        linkText: linkText === undefined ? slide.linkText : linkText || null,
         isActive: isActive === undefined ? slide.isActive : isActive === 'true' || isActive === true,
         displayOrder: displayOrder === undefined ? slide.displayOrder : parseInt(displayOrder)
       }

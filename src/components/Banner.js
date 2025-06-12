@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
-
 const Banner = () => {
   const [slides, setSlides] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAutoSliding, setIsAutoSliding] = useState(true);
-
 
   useEffect(() => {
     const fetchSlides = async () => {
@@ -18,16 +16,19 @@ const Banner = () => {
         }
         const data = await response.json();
         
-
         if (data.length === 0) {
           setSlides([{
             id: 'default',
             imageUrl: '/img/header-bg.jpg', 
-            title: 'Welcome to our store',
-            subtitle: 'Best products for best prices'
+            title: 'КРАЩИЙ СПОСІБ',
+            subtitle: 'придбати власний автомобіль',
+            linkText: 'ЗНАЙТИ СВОЄ АВТО',
+            linkUrl: '#'
           }]);
         } else {
           setSlides(data);
+          console.log('Slides received from API:', data);
+
         }
         setLoading(false);
       } catch (error) {
@@ -37,8 +38,10 @@ const Banner = () => {
         setSlides([{
           id: 'default',
           imageUrl: '/img/header-bg.jpg',
-          title: 'Welcome to our store',
-          subtitle: 'Best products for best prices'
+          title: 'КРАЩИЙ СПОСІБ',
+          subtitle: 'придбати власний автомобіль',
+          linkText: 'ЗНАЙТИ СВОЄ АВТО',
+          linkUrl: '#'
         }]);
         setLoading(false);
       }
@@ -46,7 +49,6 @@ const Banner = () => {
 
     fetchSlides();
   }, []);
-
 
   useEffect(() => {
     if (!isAutoSliding || slides.length <= 1) return; 
@@ -57,7 +59,6 @@ const Banner = () => {
 
     return () => clearInterval(interval);
   }, [slides.length, isAutoSliding]);
-
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
@@ -90,25 +91,37 @@ const Banner = () => {
   }
 
   return (
-    <div className="banner-container">
-      <div className="banner-slider">
+    <div className="hero-banner">
+      <div className="hero-slider">
         {slides.map((slide, index) => (
           <div 
             key={slide.id} 
-            className={`banner-slide ${index === currentSlide ? 'active' : ''}`}
-            style={{ 
-              backgroundImage: `url(${slide.imageUrl})`,
-              opacity: index === currentSlide ? 1 : 0
-            }}
+            className={`hero-slide ${index === currentSlide ? 'active' : ''}`}
           >
-            <div className="banner-content">
-              {slide.title && <h2 className="banner-title">{slide.title}</h2>}
-              {slide.subtitle && <p className="banner-subtitle">{slide.subtitle}</p>}
-              {slide.linkUrl && (
-                <a href={slide.linkUrl} className="banner-btn">
-                  Learn More
-                </a>
-              )}
+            <div className="hero-background">
+              <img src={slide.imageUrl} alt={slide.title || 'Banner'} />
+            </div>
+            
+            <div className="hero-content">
+              <div className="hero-content-wrapper">
+                <div className="hero-text">
+                  {slide.title && (
+                    <h1 className="hero-title">
+                      {slide.title}
+                    </h1>
+                  )}
+                  {slide.subtitle && (
+                    <p className="hero-subtitle">
+                      {slide.subtitle}
+                    </p>
+                  )}
+                  {slide.linkUrl && slide.linkText && (
+                    <a href={slide.linkUrl} className="hero-btn">
+                      {slide.linkText}
+                    </a>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         ))}
@@ -116,19 +129,23 @@ const Banner = () => {
 
       {slides.length > 1 && (
         <>
-          <button onClick={prevSlide} className="banner-nav-btn prev-btn" aria-label="Previous slide">
-            ❮
+          <button onClick={prevSlide} className="hero-nav-btn hero-prev" aria-label="Previous slide">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </button>
-          <button onClick={nextSlide} className="banner-nav-btn next-btn" aria-label="Next slide">
-            ❯
+          <button onClick={nextSlide} className="hero-nav-btn hero-next" aria-label="Next slide">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </button>
           
-          <div className="banner-dots">
+          <div className="hero-indicators">
             {slides.map((_, index) => (
               <button 
                 key={index} 
                 onClick={() => goToSlide(index)}
-                className={`banner-dot ${index === currentSlide ? 'active' : ''}`}
+                className={`hero-indicator ${index === currentSlide ? 'active' : ''}`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}

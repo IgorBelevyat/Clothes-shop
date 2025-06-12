@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import './BannerManager.css';
 
@@ -16,6 +15,7 @@ const BannerManager = () => {
     title: '',
     subtitle: '',
     linkUrl: '',
+    linkText: '',
     isActive: true
   });
 
@@ -72,6 +72,7 @@ const BannerManager = () => {
       title: '',
       subtitle: '',
       linkUrl: '',
+      linkText: '',
       isActive: true
     });
     setSelectedFile(null);
@@ -87,6 +88,7 @@ const BannerManager = () => {
       title: slide.title || '',
       subtitle: slide.subtitle || '',
       linkUrl: slide.linkUrl || '',
+      linkText: slide.linkText || '',
       isActive: slide.isActive
     });
     setPreviewUrl(slide.imageUrl);
@@ -101,6 +103,7 @@ const BannerManager = () => {
       formDataObj.append('title', formData.title);
       formDataObj.append('subtitle', formData.subtitle);
       formDataObj.append('linkUrl', formData.linkUrl);
+      formDataObj.append('linkText', formData.linkText);
       formDataObj.append('isActive', formData.isActive);
       
       if (selectedFile) {
@@ -288,6 +291,19 @@ const BannerManager = () => {
                 className="form-control"
               />
             </div>
+
+            <div className="form-group">
+              <label htmlFor="linkText">Button Text (optional)</label>
+              <input 
+                type="text" 
+                id="linkText" 
+                name="linkText" 
+                value={formData.linkText} 
+                onChange={handleInputChange}
+                className="form-control"
+                placeholder="e.g. Learn More, Shop Now"
+              />
+            </div>
             
             <div className="form-group-checkbox">
             <h4 className=''>Active</h4>
@@ -336,6 +352,7 @@ const BannerManager = () => {
                     <div className="slide-info">
                       <h4>{slide.title || 'Untitled Slide'}</h4>
                       {slide.subtitle && <p>{slide.subtitle}</p>}
+                      {slide.linkText && <span className="link-text">Button: {slide.linkText}</span>}
                       <div className="slide-meta">
                         <span className={`status ${slide.isActive ? 'active' : 'inactive'}`}>
                           {slide.isActive ? 'Active' : 'Inactive'}

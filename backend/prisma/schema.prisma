@@ -40,13 +40,14 @@ model Product {
 }
 
 model BannerSlide {
-  id          Int      @id @default(autoincrement())
-  title       String?
-  subtitle    String?
-  imageUrl    String
-  linkUrl     String?
-  isActive    Boolean  @default(true)
+  id           Int      @id @default(autoincrement())
+  title        String?
+  subtitle     String?
+  imageUrl     String
+  linkUrl      String?
+  linkText     String?   
+  isActive     Boolean  @default(true)
   displayOrder Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

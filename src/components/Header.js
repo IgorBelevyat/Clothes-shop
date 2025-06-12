@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart, FaUser } from "react-icons/fa";
 import Order from './Order';
 import { Link, useLocation } from 'react-router-dom';
 import Banner from './Banner';
@@ -27,6 +27,7 @@ const showNothing = () => {
 
 export default function Header(props) {
   const [cartOpen, setCartOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const location = useLocation();
 
   const isLoggedIn = props.user !== null;
@@ -37,14 +38,18 @@ export default function Header(props) {
     document.querySelector("footer")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleLogout = () => {
+    props.onLogout();
+    setAccountMenuOpen(false);
+  };
+
   return (
-    <header>
-      <div>
+    <header className='header'>
+      <div className='header-container'>
         <span className='logo'>Clothing store</span>
         <ul className='nav'>
           <li><Link to="/">Home</Link></li>
           
-
           {isLoggedIn && (
             <li><Link to="/cabinet">My Cabinet</Link></li>
           )}
@@ -52,27 +57,42 @@ export default function Header(props) {
           <li onClick={scrollToFooter} style={{ cursor: 'pointer' }}>About us</li>
           <li onClick={scrollToFooter} style={{ cursor: 'pointer' }}>Contacts</li>
 
-          {isLoggedIn ? (
-            <li>
-              <span className="user-label">{userFirstName || 'Loading...'}</span>
-            </li>
-          ) : (
-            <>
-              <li><Link to="/login">Sign in</Link></li>
-              <li><Link to="/register">Sign up</Link></li>
-            </>
-          )}
-
-
           {isLoggedIn && (props.user.role === 'admin' || props.user.role === 'content-manager') && (
             <li><Link to="/cms">CMS</Link></li>
           )}
         </ul>
 
-        <FaShoppingCart
-          onClick={() => setCartOpen(!cartOpen)}
-          className={`shop-cart-button ${cartOpen && 'active'}`}
-        />
+        <div className="header-actions">
+          <div className="account-section">
+            {isLoggedIn ? (
+              <span className="user-name">{userFirstName || 'Loading...'}</span>
+            ) : (
+              <>
+                <FaUser
+                  onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+                  className={`account-icon ${accountMenuOpen && 'active'}`}
+                />
+                {accountMenuOpen && (
+                  <div className='account-dropdown'>
+                    <div className="dropdown-content">
+                      <Link to="/login" className="dropdown-link primary">
+                        Увійти
+                      </Link>
+                      <Link to="/register" className="dropdown-link secondary">
+                        Зареєструватися
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          <FaShoppingCart
+            onClick={() => setCartOpen(!cartOpen)}
+            className={`shop-cart-button ${cartOpen && 'active'}`}
+          />
+        </div>
 
         {cartOpen && (
           <div className='shop-cart'>
@@ -80,7 +100,6 @@ export default function Header(props) {
           </div>
         )}
       </div>
-      {shouldShowBanner && <Banner />}
     </header>
   );
 }
