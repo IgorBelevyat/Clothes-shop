@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import './Categories.css';
 
 function Categories({ categories: initialCategories, chooseCategory }) {
   const [columns, setColumns] = useState([]);

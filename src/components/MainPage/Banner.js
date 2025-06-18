@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './Banner.css';
 
 const Banner = () => {
   const [slides, setSlides] = useState([]);

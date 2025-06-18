@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { FaShoppingCart, FaUser } from "react-icons/fa";
-import Order from './Order';
+import Order from './MainPage/Order';
 import { Link, useLocation } from 'react-router-dom';
-import Banner from './Banner';
+import Banner from './MainPage/Banner';
 
 const showOrders = (props) => {
   let sum = 0;

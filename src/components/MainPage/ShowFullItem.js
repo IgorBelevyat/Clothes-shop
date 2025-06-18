@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { FaAngleLeft } from 'react-icons/fa'
+import './ShowFullItem.css';
 
 export class ShowFullItem extends Component {
   render() {

@@ -1,3 +1,5 @@
+// РЕДАГУВАТИ ІСНУЮЧИЙ ФАЙЛ: AddProductForm.js
+
 import React, { useState, useEffect } from 'react';
 import './AddProductForm.css';
 
@@ -7,6 +9,8 @@ export default function AddProductForm() {
   const [price, setPrice] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState([]);
+  const [categoryAttributes, setCategoryAttributes] = useState([]);
+  const [attributeValues, setAttributeValues] = useState({});
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -15,6 +19,15 @@ export default function AddProductForm() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    if (categoryId) {
+      fetchCategoryAttributes(categoryId);
+    } else {
+      setCategoryAttributes([]);
+      setAttributeValues({});
+    }
+  }, [categoryId]);
 
   const fetchCategories = async () => {
     setLoading(true);
@@ -36,6 +49,25 @@ export default function AddProductForm() {
     }
   };
 
+  const fetchCategoryAttributes = async (catId) => {
+    try {
+      const res = await fetch(`http://localhost:3001/api/categories/${catId}/attributes`, {
+        credentials: 'include'
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch category attributes');
+      }
+      const data = await res.json();
+      setCategoryAttributes(data);
+      
+      // Очищаємо попередні значення атрибутів
+      setAttributeValues({});
+    } catch (err) {
+      console.error("Error fetching category attributes:", err);
+      setCategoryAttributes([]);
+    }
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -49,6 +81,13 @@ export default function AddProductForm() {
     setPreview(null);
     const fileInput = document.getElementById('productImage');
     if (fileInput) fileInput.value = '';
+  };
+
+  const handleAttributeChange = (attributeSlug, value) => {
+    setAttributeValues(prev => ({
+      ...prev,
+      [attributeSlug]: value
+    }));
   };
 
   const flattenCategories = (categories, level = 0, result = []) => {
@@ -67,6 +106,98 @@ export default function AddProductForm() {
     return result;
   };
 
+  const renderAttributeInput = (categoryAttribute) => {
+    const attr = categoryAttribute.attribute;
+    const value = attributeValues[attr.slug] || '';
+
+    switch (attr.type) {
+      case 'SELECT':
+        return (
+          <select
+            value={value}
+            onChange={(e) => handleAttributeChange(attr.slug, e.target.value)}
+            required={categoryAttribute.isRequired}
+          >
+            <option value="">Оберіть {attr.name.toLowerCase()}</option>
+            {attr.attributeValues.map(attrValue => (
+              <option key={attrValue.id} value={attrValue.id}>
+                {attrValue.displayName || attrValue.value}
+              </option>
+            ))}
+          </select>
+        );
+
+      case 'TEXT':
+        return (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => handleAttributeChange(attr.slug, e.target.value)}
+            placeholder={`Введіть ${attr.name.toLowerCase()}`}
+            required={categoryAttribute.isRequired}
+          />
+        );
+
+      case 'NUMBER':
+        return (
+          <input
+            type="number"
+            step="0.01"
+            value={value}
+            onChange={(e) => handleAttributeChange(attr.slug, e.target.value)}
+            placeholder={`Введіть ${attr.name.toLowerCase()}`}
+            required={categoryAttribute.isRequired}
+          />
+        );
+
+      case 'BOOLEAN':
+        return (
+          <div className="checkbox-container">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={value === 'true' || value === true}
+                onChange={(e) => handleAttributeChange(attr.slug, e.target.checked)}
+                className="checkbox-input"
+              />
+              <span>{attr.name}</span>
+            </label>
+          </div>
+        );
+
+      case 'RANGE':
+        return (
+          <div className="range-inputs">
+            <input
+              type="number"
+              step="0.01"
+              value={value.split(',')[0] || ''}
+              onChange={(e) => {
+                const [, max] = (value || ',').split(',');
+                handleAttributeChange(attr.slug, `${e.target.value},${max || ''}`);
+              }}
+              placeholder="Від"
+              className="range-input"
+            />
+            <input
+              type="number"
+              step="0.01"
+              value={value.split(',')[1] || ''}
+              onChange={(e) => {
+                const [min] = (value || ',').split(',');
+                handleAttributeChange(attr.slug, `${min || ''},${e.target.value}`);
+              }}
+              placeholder="До"
+              className="range-input"
+            />
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -74,13 +205,21 @@ export default function AddProductForm() {
     setError('');
     
     try {
+      // Перевіряємо обов'язкові атрибути
+      const requiredAttributes = categoryAttributes.filter(ca => ca.isRequired);
+      for (const reqAttr of requiredAttributes) {
+        if (!attributeValues[reqAttr.attribute.slug]) {
+          throw new Error(`Поле "${reqAttr.attribute.name}" є обов'язковим`);
+        }
+      }
+
       let imageUrl = null;
       
       if (image) {
         const formData = new FormData();
         formData.append('image', image);
         
-        const uploadRes = await fetch('http://localhost:3001/api/upload', {
+        const uploadRes = await fetch('http://localhost:3001/api/products/upload', {
           method: 'POST',
           credentials: 'include',
           body: formData,
@@ -100,6 +239,7 @@ export default function AddProductForm() {
         price: parseFloat(price),
         image: imageUrl,
         categoryId: parseInt(categoryId),
+        attributes: attributeValues
       };
       
       const productRes = await fetch('http://localhost:3001/api/products', {
@@ -109,20 +249,22 @@ export default function AddProductForm() {
         body: JSON.stringify(productData)
       });
       
-      const productData_1 = await productRes.json();
+      const productResult = await productRes.json();
       
       if (productRes.ok) {
         alert('Product added successfully!');
+        // Очищаємо форму
         setTitle('');
         setDescription('');
         setPrice('');
         setCategoryId('');
+        setAttributeValues({});
         setImage(null);
         setPreview(null);
         const fileInput = document.getElementById('productImage');
         if (fileInput) fileInput.value = '';
       } else {
-        throw new Error(productData_1.error || 'Failed to add product');
+        throw new Error(productResult.error || 'Failed to add product');
       }
     } catch (err) {
       console.error("Error adding product:", err);
@@ -165,6 +307,28 @@ export default function AddProductForm() {
             ))}
           </select>
         </div>
+
+        {/* Динамічні атрибути */}
+        {categoryAttributes.length > 0 && (
+          <div className="attributes-section">
+            <h3>Product Attributes</h3>
+            
+            {categoryAttributes.map(categoryAttribute => (
+              <div key={categoryAttribute.id} className="form-group attribute-field">
+                <label>
+                  {categoryAttribute.attribute.name}
+                  {categoryAttribute.isRequired && (
+                    <span className="required-mark">*</span>
+                  )}
+                  {categoryAttribute.attribute.unit && (
+                    <span className="unit-label">({categoryAttribute.attribute.unit})</span>
+                  )}
+                </label>
+                {renderAttributeInput(categoryAttribute)}
+              </div>
+            ))}
+          </div>
+        )}
         
         <div className="form-group description-field">
           <label>Description:</label>

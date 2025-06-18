@@ -1,0 +1,496 @@
+/* ProductsTable.css */
+
+.products-table-container {
+  margin-left: 20px;
+  max-width: calc(100vw - 290px); /* Обмежуємо ширину з урахуванням sidebar */
+  font-family: "Montserrat", sans-serif;
+  box-sizing: border-box;
+}
+
+.products-table-container h3 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Category Selector */
+.category-selector {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.category-selector label {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Products Table */
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.products-table th,
+.products-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: top;
+}
+
+.products-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.products-table tr:hover:not(.editing) {
+  background-color: #f8f9fa;
+}
+
+.products-table tr.editing {
+  background-color: #f0f7ff;
+  box-shadow: inset 0 0 0 2px #007bff;
+}
+
+/* Image Cells */
+.product-image-cell {
+  width: 80px;
+  text-align: center;
+}
+
+.product-image,
+.product-image-preview {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.image-input {
+  font-size: 10px;
+  width: 100%;
+}
+
+/* Form Inputs */
+.edit-input,
+.edit-select,
+.edit-textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: "Montserrat", sans-serif;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.edit-input:focus,
+.edit-select:focus,
+.edit-textarea:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.edit-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.price-input {
+  width: 100px;
+}
+
+/* Description Cell */
+.description-cell {
+  max-width: 200px;
+}
+
+.description-text {
+  max-height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+/* Attributes Cell */
+.attributes-cell {
+  max-width: 180px;
+  font-size: 12px;
+}
+
+/* Actions Cell */
+.actions-cell {
+  white-space: nowrap;
+  width: 100px;
+  text-align: center;
+}
+
+.edit-btn,
+.delete-btn,
+.save-btn,
+.cancel-btn {
+  padding: 6px 10px;
+  margin: 0 2px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.edit-btn:hover {
+  background-color: #e3f2fd;
+  transform: scale(1.1);
+}
+
+.delete-btn:hover {
+  background-color: #ffebee;
+  transform: scale(1.1);
+}
+
+.save-btn:hover {
+  background-color: #e8f5e8;
+  transform: scale(1.1);
+}
+
+.cancel-btn:hover {
+  background-color: #f5f5f5;
+  transform: scale(1.1);
+}
+
+/* No Products Message */
+.no-products {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
+  font-size: 16px;
+}
+
+/* Loading and Error States */
+.loading,
+.error {
+  padding: 30px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.loading {
+  color: #666;
+}
+
+.error {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+}
+
+/* Pagination */
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: "Montserrat", sans-serif;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  border-color: #007bff;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: #f8f9fa;
+}
+
+.pagination span {
+  padding: 8px 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* 📱 RESPONSIVE DESIGN */
+
+/* Планшеты (768px - 1024px) */
+@media (max-width: 1024px) {
+  .products-table-container {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  
+  .products-table th,
+  .products-table td {
+    padding: 8px;
+    font-size: 13px;
+  }
+  
+  .product-image,
+  .product-image-preview {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .description-cell {
+    max-width: 150px;
+  }
+  
+  .attributes-cell {
+    max-width: 140px;
+    font-size: 11px;
+  }
+}
+
+/* Планшеты портретная ориентация (768px и меньше) */
+@media (max-width: 768px) {
+  .products-table-container {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+  
+  .products-table-container h3 {
+    font-size: 20px;
+    text-align: center;
+  }
+  
+  /* Переводим таблицу в карточки */
+  .products-table,
+  .products-table thead,
+  .products-table tbody,
+  .products-table th,
+  .products-table td,
+  .products-table tr {
+    display: block;
+  }
+  
+  .products-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  .products-table tr {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .products-table tr.editing {
+    border-color: #007bff;
+    box-shadow: 0 4px 16px rgba(0, 123, 255, 0.2);
+  }
+  
+  .products-table td {
+    border: none;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .products-table td:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #333;
+    flex-basis: 30%;
+    font-size: 12px;
+  }
+  
+  .product-image-cell:before {
+    content: "Image:";
+  }
+  
+  .products-table td:nth-child(2):before {
+    content: "Title:";
+  }
+  
+  .products-table td:nth-child(3):before {
+    content: "Description:";
+  }
+  
+  .products-table td:nth-child(4):before {
+    content: "Price:";
+  }
+  
+  .products-table td:nth-child(5):before {
+    content: "Category:";
+  }
+  
+  .products-table td:nth-child(6):before {
+    content: "Attributes:";
+  }
+  
+  .products-table td:nth-child(7):before {
+    content: "Actions:";
+  }
+  
+  .description-cell,
+  .attributes-cell {
+    max-width: none;
+  }
+  
+  .description-text {
+    max-height: none;
+    overflow: visible;
+  }
+  
+  .actions-cell {
+    justify-content: flex-end;
+    gap: 5px;
+  }
+  
+  .category-selector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .category-selector select {
+    width: 100%;
+  }
+}
+
+/* Мобильные телефоны (480px и меньше) */
+@media (max-width: 480px) {
+  .products-table-container {
+    margin: 0;
+    padding: 10px;
+  }
+  
+  .products-table-container h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  
+  .products-table tr {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .products-table td {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 6px 0;
+  }
+  
+  .products-table td:before {
+    flex-basis: auto;
+    margin-bottom: 4px;
+  }
+  
+  .product-image,
+  .product-image-preview {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .edit-input,
+  .edit-select,
+  .edit-textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .actions-cell {
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .edit-btn,
+  .delete-btn,
+  .save-btn,
+  .cancel-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .pagination button,
+  .pagination span {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Очень маленькие экраны (320px и меньше) */
+@media (max-width: 320px) {
+  .products-table-container {
+    padding: 5px;
+  }
+  
+  .products-table tr {
+    padding: 8px;
+  }
+  
+  .products-table td {
+    font-size: 12px;
+    padding: 4px 0;
+  }
+  
+  .products-table td:before {
+    font-size: 11px;
+  }
+  
+  .product-image,
+  .product-image-preview {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+/* Ландшафтная ориентация мобильных */
+@media (max-width: 768px) and (orientation: landscape) {
+  .products-table td {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .products-table td:before {
+    flex-basis: 25%;
+    margin-bottom: 0;
+    margin-right: 10px;
+  }
+}

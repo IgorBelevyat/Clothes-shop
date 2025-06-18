@@ -1,0 +1,64 @@
+/* Items.css */
+
+main {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  background-color: #f8f9fa;
+}
+
+/* Loading and Empty States */
+.items-loading {
+  text-align: center;
+  padding: 50px;
+  color: #666;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+}
+
+.items-empty {
+  text-align: center;
+  padding: 50px;
+  color: #666;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  main {
+    gap: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  main {
+    gap: 16px;
+    padding: 16px;
+    background-color: #f8f9fa;
+  }
+  
+  .items-loading,
+  .items-empty {
+    padding: 30px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .items-loading,
+  .items-empty {
+    padding: 20px 12px;
+  }
+}

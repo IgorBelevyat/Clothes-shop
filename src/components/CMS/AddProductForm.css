@@ -252,3 +252,96 @@
     box-sizing: border-box;
   }
 }
+
+/* ДОДАТИ ДО ІСНУЮЧОГО ФАЙЛУ AddProductForm.css */
+
+/* Стилі для атрибутів */
+.attributes-section {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.attributes-section h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #495057;
+  font-size: 18px;
+}
+
+.attribute-field {
+  margin-bottom: 20px;
+}
+
+.required-mark {
+  color: #dc3545;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.unit-label {
+  color: #6c757d;
+  font-size: 14px;
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+.form-control {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  font-family: "Montserrat", sans-serif;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #666;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+  background-color: #fff;
+}
+
+.checkbox-container {
+  padding: 14px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #333;
+}
+
+.checkbox-input {
+  transform: scale(1.2);
+  margin: 0;
+}
+
+.range-inputs {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.range-input {
+  flex: 1;
+}
+
+.range-inputs::before {
+  content: "—";
+  color: #666;
+  font-weight: bold;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  pointer-events: none;
+}

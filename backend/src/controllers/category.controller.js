@@ -1,10 +1,32 @@
 const prisma = require('../config/prisma.client.js');
 const memoizeAsync = require('../services/memorization');
 
+// Функція для створення slug з назви
+const createSlug = (name) => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9а-я]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+};
 
-// Вивести в сервіси 
+// Отримати дерево категорій з атрибутами
 const getCategoryTreeLocal = memoizeAsync(async () => {
   const allCategories = await prisma.category.findMany({
+    include: {
+      attributes: {
+        include: {
+          attribute: {
+            include: {
+              attributeValues: {
+                orderBy: { displayOrder: 'asc' }
+              }
+            }
+          }
+        },
+        orderBy: { displayOrder: 'asc' }
+      }
+    },
     orderBy: {
       name: 'asc',
     },
@@ -30,7 +52,7 @@ const getCategoryTreeLocal = memoizeAsync(async () => {
   return rootCategories;
 }, {
   strategy: 'TTL',
-  ttl:60000,
+  ttl: 60000,
   maxSize: 1
 });
 
@@ -53,8 +75,7 @@ async function isDescendantOfLocal(potentialDescendantId, ancestorId) {
   return false; 
 }
 
-//--------
-
+// Отримати всі категорії
 const getAllCategories = async (req, res, next) => {
   try {
     const categoryTree = await getCategoryTreeLocal();
@@ -64,6 +85,7 @@ const getAllCategories = async (req, res, next) => {
   }
 };
 
+// Створити категорію
 const createCategory = async (req, res, next) => {
   if (req.user.role !== 'admin' && req.user.role !== 'content-manager') {
     return res.status(403).json({ error: 'Access denied' });
@@ -85,19 +107,27 @@ const createCategory = async (req, res, next) => {
       }
     }
 
+    const slug = createSlug(name.trim());
+    
     const newCategory = await prisma.category.create({
       data: {
         name: name.trim(),
+        slug,
         parentId: parentId ? parseInt(parentId) : null,
       },
     });
+    
     getCategoryTreeLocal.clear();
     res.status(201).json(newCategory);
   } catch (err) {
+    if (err.code === 'P2002') {
+      return res.status(400).json({ error: 'Category with this name already exists' });
+    }
     next(err);
   }
 };
 
+// Оновити категорію
 const updateCategory = async (req, res, next) => {
   if (req.user.role !== 'admin' && req.user.role !== 'content-manager') {
     return res.status(403).json({ error: 'Access denied' });
@@ -130,21 +160,32 @@ const updateCategory = async (req, res, next) => {
         return res.status(400).json({ error: 'Cannot move category into its own subcategory (cyclic dependency)' });
       }
     }
+
+    const updateData = {
+      parentId: newParentId,
+    };
+
+    if (name !== undefined) {
+      updateData.name = name.trim();
+      updateData.slug = createSlug(name.trim());
+    }
     
     const updatedCategory = await prisma.category.update({
       where: { id: categoryId },
-      data: {
-        name: name !== undefined ? name.trim() : categoryToUpdate.name,
-        parentId: newParentId,
-      },
+      data: updateData,
     });
+    
     getCategoryTreeLocal.clear();
     res.status(200).json(updatedCategory);
   } catch (err) {
+    if (err.code === 'P2002') {
+      return res.status(400).json({ error: 'Category with this name already exists' });
+    }
     next(err);
   }
 };
 
+// Отримати товари за категорією
 const getProductsByCategoryId = async (req, res, next) => {
   const categoryId = parseInt(req.params.id);
   if (isNaN(categoryId)) {
@@ -161,6 +202,14 @@ const getProductsByCategoryId = async (req, res, next) => {
 
     const products = await prisma.product.findMany({
       where: { categoryId: categoryId },
+      include: {
+        attributes: {
+          include: {
+            attribute: true,
+            attributeValue: true
+          }
+        }
+      }
     });
     res.status(200).json(products);
   } catch (err) {
@@ -168,6 +217,7 @@ const getProductsByCategoryId = async (req, res, next) => {
   }
 };
 
+// Видалити категорію
 const deleteCategory = async (req, res, next) => {
   if (req.user.role !== 'admin' && req.user.role !== 'content-manager') {
     return res.status(403).json({ error: 'Access denied' });
@@ -196,8 +246,75 @@ const deleteCategory = async (req, res, next) => {
     await prisma.category.delete({
       where: { id: categoryId },
     });
+    
     getCategoryTreeLocal.clear();
     res.status(200).json({ message: 'Category successfully deleted' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Отримати атрибути категорії з успадкованими від батьківських
+const getCategoryAttributesWithInherited = async (req, res, next) => {
+  const categoryId = parseInt(req.params.id);
+
+  try {
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+
+    if (!category) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+
+    // Збираємо ідентифікатори категорій від поточної до кореневої
+    const categoryPath = [];
+    let currentCategory = category;
+    
+    while (currentCategory) {
+      categoryPath.unshift(currentCategory.id);
+      if (currentCategory.parentId) {
+        currentCategory = await prisma.category.findUnique({
+          where: { id: currentCategory.parentId }
+        });
+      } else {
+        break;
+      }
+    }
+
+    // Отримуємо атрибути для всіх категорій в ієрархії
+    const attributes = await prisma.categoryAttribute.findMany({
+      where: {
+        categoryId: { in: categoryPath }
+      },
+      include: {
+        attribute: {
+          include: {
+            attributeValues: {
+              orderBy: { displayOrder: 'asc' }
+            }
+          }
+        },
+        category: true
+      },
+      orderBy: [
+        { displayOrder: 'asc' },
+        { attribute: { displayOrder: 'asc' } }
+      ]
+    });
+
+    // Видаляємо дублікати атрибутів (пріоритет має найближча до товару категорія)
+    const uniqueAttributes = [];
+    const seenAttributeIds = new Set();
+
+    for (const attr of attributes.reverse()) {
+      if (!seenAttributeIds.has(attr.attributeId)) {
+        uniqueAttributes.unshift(attr);
+        seenAttributeIds.add(attr.attributeId);
+      }
+    }
+
+    res.json(uniqueAttributes);
   } catch (err) {
     next(err);
   }
@@ -209,4 +326,5 @@ module.exports = {
   updateCategory,
   getProductsByCategoryId,
   deleteCategory,
+  getCategoryAttributesWithInherited,
 };

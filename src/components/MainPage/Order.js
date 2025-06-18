@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { FaTrash } from 'react-icons/fa'
+import './Order.css';
 
 export class Order extends Component {
   render() {

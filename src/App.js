@@ -1,16 +1,18 @@
+// РЕДАГУВАТИ ІСНУЮЧИЙ ФАЙЛ: App.js
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import Items from "./components/items";
-import Categories from "./components/Catagories";
-import ShowFullItem from "./components/ShowFullItem";
-import Register from "./components/Register";
-import Login from "./components/Login";
+import Items from "./components/MainPage/items";
+import Categories from "./components/MainPage/Catagories";
+import ShowFullItem from "./components/MainPage/ShowFullItem";
+import Register from "./components/Auth/Register";
+import Login from "./components/Auth/Login";
 import CMS from './components/CMS';
 import UserCabinet from './components/UserCabinet';
-import { withRouter } from "./components/withRouter";
-import Banner from './components/Banner';
+import { withRouter } from "./components/MainPage/withRouter";
+import Banner from './components/MainPage/Banner';
 
 class App extends React.Component {
   constructor(props) {
@@ -34,15 +36,31 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    // ВИПРАВЛЕНО: обробляємо нову структуру відповіді API
     fetch('http://localhost:3001/api/products')
       .then(res => res.json())
-      .then(data => this.setState({ items: data, currentItems: data }))
-      .catch(err => console.error("Error fetching products:", err));
+      .then(data => {
+        // Перевіряємо, чи відповідь має структуру { products: [...] } або просто масив
+        const products = data.products || data;
+        this.setState({ 
+          items: Array.isArray(products) ? products : [], 
+          currentItems: Array.isArray(products) ? products : [] 
+        });
+      })
+      .catch(err => {
+        console.error("Error fetching products:", err);
+        this.setState({ items: [], currentItems: [] });
+      });
 
     fetch('http://localhost:3001/api/categories')
       .then(res => res.json())
-      .then(data => this.setState({ categories: data }))
-      .catch(err => console.error("Error fetching categories:", err));
+      .then(data => {
+        this.setState({ categories: Array.isArray(data) ? data : [] });
+      })
+      .catch(err => {
+        console.error("Error fetching categories:", err);
+        this.setState({ categories: [] });
+      });
 
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -88,9 +106,12 @@ class App extends React.Component {
     if (categoryName === 'all') {
       this.setState({ currentItems: this.state.items });
     } else {
-      if (this.state.items && this.state.items.length > 0) {
+      // ДОДАНО: перевірка на існування items
+      if (this.state.items && Array.isArray(this.state.items) && this.state.items.length > 0) {
         let selectedCategory = null;
         const findCategoryByName = (categories, name) => {
+          if (!Array.isArray(categories)) return null;
+          
           for (let category of categories) {
             if (category.name === name) {
               return category;
@@ -180,7 +201,7 @@ class App extends React.Component {
                   />
                   <Items
                     onShowItem={this.onShowItem}
-                    items={this.state.currentItems}
+                    items={this.state.currentItems || []} // ДОДАНО: захист від undefined
                     onAdd={this.addToOrder}
                   />
                   {this.state.showFullItem && (

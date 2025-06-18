@@ -1,10 +1,13 @@
+// РЕДАГУВАТИ ІСНУЮЧИЙ ФАЙЛ: CMS.js
+
 import React, { useState } from 'react';
-import AddProductForm from './AddProductForm';
-import CategoryManager from './CategoryManager';
-import ProductsTable from './ProductsTable';
-import UsersTable from './UsersTable';
-import BannerManager from './BannerManager';
-import './BannerManager.css';
+import AddProductForm from './CMS/AddProductForm';
+import CategoryManager from './CMS/CategoryManager';
+import ProductsTable from './CMS/ProductsTable';
+import UsersTable from './CMS/UsersTable';
+import BannerManager from './CMS/BannerManager';
+import AttributeManager from './CMS/AttributeManager'; // НОВИЙ ІМПОРТ
+import './CMS/BannerManager.css';
 
 export default function CMS({ user }) {
   const [activeTab, setActiveTab] = useState('products'); 
@@ -20,7 +23,6 @@ export default function CMS({ user }) {
     );
   }
 
-
   const renderContent = () => {
     switch(activeTab) {
       case 'add-product':
@@ -31,8 +33,9 @@ export default function CMS({ user }) {
         return <ProductsTable />;
       case 'banner':
         return <BannerManager />;
+      case 'attributes': // НОВИЙ КЕЙС
+        return <AttributeManager />;
       case 'users':
-
         return user.role === 'admin' ? <UsersTable /> : (
           <div className="access-denied">
             <h3>Access Denied</h3>
@@ -72,6 +75,15 @@ export default function CMS({ user }) {
                 className={`sidebar-button ${activeTab === 'categories' ? 'active' : ''}`}
               >
                 🗂️ Categories
+              </button>
+            </li>
+            {/* НОВИЙ ПУНКТ МЕНЮ */}
+            <li>
+              <button 
+                onClick={() => setActiveTab('attributes')}
+                className={`sidebar-button ${activeTab === 'attributes' ? 'active' : ''}`}
+              >
+                🏷️ Attributes
               </button>
             </li>
             <li>
