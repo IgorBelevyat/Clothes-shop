@@ -1,0 +1,503 @@
+/* AdvancedFilterComponent.css */
+
+.filters-container {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  font-family: "Montserrat", sans-serif;
+  border: 1px solid #e0e0e0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header Section */
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.filters-title {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filters-count-badge {
+  padding: 4px 8px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.clear-filters-btn {
+  padding: 8px 16px;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.clear-filters-btn:hover {
+  background-color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Loading State */
+.filters-loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Price Filter */
+.price-filter-section {
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.price-filter-label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.price-filter-inputs {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.price-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: "Montserrat", sans-serif;
+  transition: border-color 0.2s ease;
+  background-color: white;
+}
+
+.price-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.price-separator {
+  color: #666;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+/* Grid Layout for Filters */
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 100%;
+}
+
+/* Attribute Filters */
+.attribute-filter {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.attribute-label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.attribute-label.disabled {
+  color: #999;
+}
+
+.dependency-hint {
+  font-size: 12px;
+  color: #666;
+  margin-left: 5px;
+  font-weight: normal;
+  display: block;
+  margin-top: 4px;
+  margin-left: 0;
+}
+
+.attribute-input,
+.attribute-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: "Montserrat", sans-serif;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  background-color: white;
+}
+
+.attribute-input:focus,
+.attribute-select:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.attribute-input:disabled,
+.attribute-select:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Range Filters */
+.range-filter-inputs {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.range-input {
+  flex: 1;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: "Montserrat", sans-serif;
+  background-color: white;
+}
+
+.range-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.range-separator {
+  color: #666;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.range-hint {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* Boolean Filters */
+.boolean-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+  padding: 12px;
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+}
+
+.boolean-filter:hover {
+  background-color: #f8f9fa;
+  border-color: #007bff;
+}
+
+.boolean-checkbox {
+  transform: scale(1.2);
+  margin: 0;
+}
+
+/* Empty States */
+.filters-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+/* 📱 RESPONSIVE DESIGN */
+
+/* Планшети (768px - 1024px) */
+@media (max-width: 1024px) {
+  .filters-container {
+    padding: 15px;
+  }
+  
+  .filters-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  
+  .attribute-filter,
+  .price-filter-section {
+    padding: 15px;
+  }
+}
+
+/* Планшети портретна ориентація (768px і менше) */
+@media (max-width: 768px) {
+  .filters-container {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .filters-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+  }
+  
+  .filters-title {
+    font-size: 16px;
+    justify-content: center;
+  }
+  
+  .clear-filters-btn {
+    align-self: center;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  .filters-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .price-filter-section,
+  .attribute-filter {
+    padding: 15px;
+  }
+  
+  .price-filter-inputs,
+  .range-filter-inputs {
+    gap: 12px;
+  }
+  
+  .attribute-input,
+  .attribute-select,
+  .price-input,
+  .range-input {
+    padding: 12px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .dependency-hint {
+    margin-top: 6px;
+  }
+}
+
+/* Мобільні телефони (480px і менше) */
+@media (max-width: 480px) {
+  .filters-container {
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  .filters-header {
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+  }
+  
+  .filters-title {
+    font-size: 15px;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .filters-count-badge {
+    align-self: center;
+  }
+  
+  .clear-filters-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  .price-filter-section,
+  .attribute-filter {
+    padding: 12px;
+  }
+  
+  .attribute-label,
+  .price-filter-label {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .price-filter-inputs,
+  .range-filter-inputs {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  
+  .price-separator,
+  .range-separator {
+    text-align: center;
+    order: 1;
+    font-size: 14px;
+  }
+  
+  .attribute-input,
+  .attribute-select,
+  .price-input,
+  .range-input {
+    padding: 14px 16px;
+    font-size: 16px;
+    border-radius: 6px;
+  }
+  
+  .boolean-filter {
+    justify-content: center;
+    padding: 14px;
+    font-size: 15px;
+  }
+  
+  .range-hint {
+    font-size: 12px;
+    text-align: center;
+    margin-top: 6px;
+  }
+  
+  .dependency-hint {
+    font-size: 12px;
+    margin-top: 6px;
+  }
+}
+
+/* Дуже маленькі екрани (320px і менше) */
+@media (max-width: 320px) {
+  .filters-container {
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .filters-header {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+  }
+  
+  .filters-title {
+    font-size: 14px;
+  }
+  
+  .clear-filters-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .price-filter-section,
+  .attribute-filter {
+    padding: 10px;
+  }
+  
+  .attribute-label,
+  .price-filter-label {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  
+  .attribute-input,
+  .attribute-select,
+  .price-input,
+  .range-input {
+    padding: 12px 14px;
+    font-size: 16px;
+  }
+  
+  .filters-empty-state,
+  .filters-loading {
+    padding: 20px 15px;
+    font-size: 13px;
+  }
+}
+
+/* Ландшафтна орієнтація мобільних */
+@media (max-width: 768px) and (orientation: landscape) {
+  .filters-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .filters-header {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .price-filter-inputs,
+  .range-filter-inputs {
+    flex-direction: row;
+    gap: 12px;
+  }
+  
+  .price-separator,
+  .range-separator {
+    order: 0;
+  }
+}
+
+/* Покращення accessibility */
+.attribute-input:focus-visible,
+.attribute-select:focus-visible,
+.price-input:focus-visible,
+.range-input:focus-visible {
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.clear-filters-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Анімації */
+.filters-container {
+  transition: all 0.3s ease;
+}
+
+.attribute-filter {
+  transition: all 0.2s ease;
+}
+
+.attribute-filter.disabled {
+  opacity: 0.6;
+}

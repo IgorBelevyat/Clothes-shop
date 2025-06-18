@@ -1,0 +1,178 @@
+/* Categories.css */
+
+/* Контейнер усіх категорій */
+.categories-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Кнопка відкриття/закриття */
+.toggle-menu-button {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  background: #111827;
+  color: #ffffff;
+  padding: 12px 28px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.toggle-menu-button:hover {
+  background: #1f2937;
+  transform: translateY(-1px);
+}
+
+/* Загальний контейнер */
+.flyout-categories-outer-container {
+  font-family: 'Montserrat', sans-serif;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin: 24px auto;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Глобальна кнопка "Усі категорії" */
+.flyout-global-all-item {
+  font-weight: 600;
+  font-size: 15px;
+  color: #111827;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.flyout-global-all-item.active {
+  background-color: #111827;
+  color: #ffffff;
+}
+
+/* Окремий пункт категорії */
+.flyout-category-item {
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14.5px;
+  color: #374151;
+  cursor: pointer;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Активний пункт */
+.flyout-category-item.active {
+  background-color: #111827;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.flyout-category-item.active .flyout-arrow {
+  color: #ffffff;
+}
+
+/* Стрілочка для дочірніх категорій */
+.flyout-arrow {
+  font-size: 16px;
+  color: #9ca3af;
+  transition: transform 0.2s ease-in-out, color 0.2s ease;
+}
+
+.flyout-category-item:hover .flyout-arrow {
+  color: #4b5563;
+  transform: translateX(4px);
+}
+
+/* Контейнер колонок */
+.flyout-columns-wrapper {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  border-top: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  scroll-behavior: smooth;
+}
+
+/* Одна колонка */
+.flyout-category-column {
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  max-width: 300px;
+  background-color: #ffffff;
+  border-right: 1px solid #f3f4f6;
+}
+
+.flyout-category-column:last-child {
+  border-right: none;
+}
+
+.flyout-category-item:last-child {
+  border-bottom: none;
+}
+
+/* Опція "All models" */
+.flyout-all-models-option {
+  font-style: italic;
+  font-weight: 500;
+  background-color: #f8f9fa;
+}
+
+.flyout-all-models-option:hover {
+  background-color: #e9ecef;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .flyout-categories-outer-container {
+    margin: 16px auto;
+    border-radius: 12px;
+  }
+  
+  .flyout-category-column {
+    min-width: 200px;
+  }
+  
+  .flyout-category-item {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  .flyout-global-all-item {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+  
+  .toggle-menu-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .flyout-columns-wrapper {
+    flex-direction: column;
+  }
+  
+  .flyout-category-column {
+    min-width: 100%;
+    max-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .flyout-category-column:last-child {
+    border-bottom: none;
+  }
+}

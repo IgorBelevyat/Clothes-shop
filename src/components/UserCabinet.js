@@ -42,15 +42,6 @@ export default function UserCabinet({ user, orders, onLogout }) {
 
         <button
           onClick={handleLogout}
-          style={{
-            marginTop: '30px',
-            padding: '10px 20px',
-            background: 'black',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer'
-          }}
         >
           Logout
         </button>

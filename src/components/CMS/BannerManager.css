@@ -1,0 +1,711 @@
+.banner-manager {
+  width: 100%;
+  padding: 20px;
+  padding-top: 0;
+}
+
+.banner-manager h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.banner-manager-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 992px) {
+  .banner-manager-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.slide-form-container,
+.slides-list-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.slide-form-container h3,
+.slides-list-container h3 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* Form styles */
+.slide-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #555;
+}
+
+/* ✅ Checkbox aligned horizontally with label */
+.form-group-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: auto;
+}
+
+.form-group.checkbox input[type="checkbox"] {
+  margin: 0;
+}
+
+.form-group.checkbox label {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
+}
+
+/* Image selection styles */
+.file-input-container {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  cursor: pointer;
+  width: 100%;
+}
+
+.file-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 0.1px;
+  height: 0.1px;
+  cursor: pointer;
+}
+
+.file-input-label {
+  display: flex;
+  padding: 14px;
+  background-color: #f9f9f9;
+  border: 1px dashed #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #555;
+  font-weight: normal;
+  height: 100px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.file-input-label:hover {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+}
+
+.upload-icon {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.image-preview-container {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.image-preview {
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.image-preview img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border: 1px solid #eee;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #fff2f2;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.remove-image-btn:hover {
+  background-color: #d32f2f;
+  transform: scale(1.1);
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-family: "Montserrat", sans-serif;
+  display: block;
+  margin: 10px auto 0;
+  min-width: 200px;
+}
+
+.btn-primary:hover {
+  background-color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-secondary {
+  background-color: #e2e2e2;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background-color: #d1d1d1;
+}
+
+/* 🔥 SMALLER EDIT/DELETE BUTTONS - Повышаем специфичность */
+.banner-manager .slide-actions .btn-sm {
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  min-width: 32px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 3px !important;
+  margin: 0 !important;       /* Убираем глобальные margin */
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important; /* Переопределяем transition */
+}
+
+.banner-manager .slide-actions .btn-edit {
+  background-color: #4382c9 !important;
+  color: white !important;
+  border: none !important;
+}
+
+.banner-manager .slide-actions .btn-edit:hover {
+  background-color: #3b73b3 !important;
+}
+
+.banner-manager .slide-actions .btn-delete {
+  background-color: #e25c4a !important;
+  color: white !important;
+  border: none !important;
+}
+
+.banner-manager .slide-actions .btn-delete:hover {
+  background-color: #c54a3a !important;
+}
+
+/* 🔥 MOVE BUTTONS (стрелки вверх/вниз) - Повышаем специфичность */
+.banner-manager .order-buttons .btn-move {
+  background-color: #6c757d !important;
+  color: white !important;
+  padding: 2px 6px !important;
+  font-size: 12px !important;
+  min-width: 24px !important;
+  height: 24px !important;
+  border-radius: 2px !important;
+  margin: 0 !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+}
+
+.banner-manager .order-buttons .btn-move:hover {
+  background-color: #5a6268 !important;
+}
+
+.slides-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.slide-item {
+  background: #f9f9f9;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid #eee;
+}
+
+.slide-item.inactive {
+  opacity: 0.7;
+  background-color: #f2f2f2;
+  border: 1px dashed #ccc;
+}
+
+.slide-content {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  gap: 15px;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: #777;
+  padding: 0 5px;
+}
+
+.slide-thumb {
+  width: 80px;
+  height: 60px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.slide-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.slide-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.slide-info p {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slide-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: #777;
+}
+
+.status {
+  font-weight: 500;
+}
+
+.status.active {
+  color: #2ecc71;
+}
+
+.status.inactive {
+  color: #e74c3c;
+}
+
+/* 🔥 SLIDE ACTIONS - компактнее расположение кнопок */
+.slide-actions {
+  display: flex;
+  gap: 3px;                   /* Уменьшено расстояние между кнопками */
+  align-items: center;
+}
+
+.order-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;                   /* Минимальный отступ между стрелками */
+  margin-left: 5px;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #777;
+}
+
+.error-message {
+  background-color: #ffecec;
+  color: #e74c3c;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border-left: 4px solid #e74c3c;
+}
+
+/* 📱 RESPONSIVE DESIGN */
+
+/* Планшеты и небольшие ноутбуки (768px - 1024px) */
+@media (max-width: 1024px) {
+  .banner-manager {
+    padding: 15px;
+  }
+  
+  .banner-manager-content {
+    gap: 20px;
+  }
+  
+  .slide-form-container,
+  .slides-list-container {
+    padding: 15px;
+  }
+  
+  .slide-thumb {
+    width: 70px;
+    height: 50px;
+  }
+  
+  .slide-info h4 {
+    font-size: 15px;
+  }
+  
+  .slide-info p {
+    font-size: 13px;
+  }
+}
+
+/* Планшеты портретная ориентация (768px и меньше) */
+@media (max-width: 768px) {
+  .banner-manager {
+    padding: 10px;
+  }
+  
+  .banner-manager h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .banner-manager-content {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .slide-form-container,
+  .slides-list-container {
+    padding: 15px;
+  }
+  
+  .slide-form-container h3,
+  .slides-list-container h3 {
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  /* Форма на планшетах */
+  .slide-form {
+    gap: 12px;
+  }
+  
+  .file-input-label {
+    height: 80px;
+    padding: 10px;
+  }
+  
+  .upload-icon {
+    font-size: 18px;
+  }
+  
+  .image-preview img {
+    max-width: 150px;
+    max-height: 150px;
+  }
+  
+  .btn-primary {
+    padding: 12px 24px;
+    font-size: 15px;
+    min-width: 180px;
+  }
+  
+  /* Слайды на планшетах */
+  .slide-content {
+    padding: 8px;
+    gap: 10px;
+  }
+  
+  .slide-thumb {
+    width: 60px;
+    height: 45px;
+  }
+  
+  .slide-info h4 {
+    font-size: 14px;
+  }
+  
+  .slide-info p {
+    font-size: 12px;
+  }
+  
+  .slide-meta {
+    font-size: 11px;
+  }
+  
+  /* Кнопки на планшетах */
+  .banner-manager .slide-actions .btn-sm {
+    min-width: 28px !important;
+    height: 26px !important;
+    padding: 3px 6px !important;
+    font-size: 10px !important;
+  }
+  
+  .banner-manager .order-buttons .btn-move {
+    min-width: 22px !important;
+    height: 22px !important;
+    padding: 1px 4px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* Мобильные телефоны (480px и меньше) */
+@media (max-width: 480px) {
+  .banner-manager {
+    padding: 8px;
+  }
+  
+  .banner-manager h2 {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+  
+  .banner-manager-content {
+    gap: 12px;
+  }
+  
+  .slide-form-container,
+  .slides-list-container {
+    padding: 12px;
+    border-radius: 6px;
+  }
+  
+  .slide-form-container h3,
+  .slides-list-container h3 {
+    font-size: 15px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+  
+  /* Форма на мобильных */
+  .slide-form {
+    gap: 10px;
+  }
+  
+  .form-group label {
+    font-size: 14px;
+  }
+  
+  .form-control {
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  .file-input-label {
+    height: 70px;
+    padding: 8px;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .upload-icon {
+    font-size: 16px;
+    margin-right: 0;
+  }
+  
+  .file-input-label span:last-child {
+    font-size: 12px;
+  }
+  
+  .image-preview img {
+    max-width: 120px;
+    max-height: 120px;
+  }
+  
+  .remove-image-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+  
+  .btn-primary {
+    padding: 10px 20px;
+    font-size: 14px;
+    min-width: 160px;
+  }
+  
+  .form-group-checkbox {
+    justify-content: center;
+  }
+  
+  /* Слайды на мобильных */
+  .slides-list {
+    gap: 10px;
+  }
+  
+  .slide-item {
+    border-radius: 4px;
+  }
+  
+  .slide-content {
+    padding: 6px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .slide-thumb {
+    width: 50px;
+    height: 38px;
+  }
+  
+  .slide-info {
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .slide-info h4 {
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+  
+  .slide-info p {
+    font-size: 11px;
+    margin-bottom: 3px;
+  }
+  
+  .slide-meta {
+    font-size: 10px;
+    gap: 8px;
+  }
+  
+  /* Кнопки на мобильных */
+  .slide-actions {
+    gap: 2px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  
+  .banner-manager .slide-actions .btn-sm {
+    min-width: 26px !important;
+    height: 24px !important;
+    padding: 2px 4px !important;
+    font-size: 9px !important;
+    border-radius: 2px !important;
+  }
+  
+  .banner-manager .order-buttons .btn-move {
+    min-width: 20px !important;
+    height: 20px !important;
+    padding: 1px 3px !important;
+    font-size: 10px !important;
+  }
+  
+  .order-buttons {
+    margin-left: 2px;
+    gap: 1px;
+  }
+}
+
+/* Очень маленькие экраны (320px и меньше) */
+@media (max-width: 320px) {
+  .banner-manager {
+    padding: 5px;
+  }
+  
+  .slide-form-container,
+  .slides-list-container {
+    padding: 8px;
+  }
+  
+  .slide-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  
+  .slide-thumb {
+    width: 100%;
+    height: 60px;
+    align-self: center;
+  }
+  
+  .slide-info {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .slide-actions {
+    width: 100%;
+    justify-content: center;
+    margin-top: 5px;
+  }
+  
+  .btn-primary {
+    min-width: 140px;
+    font-size: 13px;
+  }
+  
+  .file-input-label {
+    height: 60px;
+  }
+}
+
+/* Ландшафтная ориентация мобильных */
+@media (max-width: 768px) and (orientation: landscape) {
+  .banner-manager-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  
+  .slide-form-container,
+  .slides-list-container {
+    padding: 10px;
+  }
+  
+  .slide-content {
+    padding: 5px;
+  }
+  
+  .file-input-label {
+    height: 60px;
+  }
+}

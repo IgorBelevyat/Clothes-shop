@@ -1,14 +1,13 @@
+// ОНОВИТИ ІСНУЮЧИЙ ФАЙЛ: schema.prisma
 
 generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 
 model User {
   id        Int     @id @default(autoincrement())
@@ -20,12 +19,68 @@ model User {
 }
 
 model Category {
-  id        Int        @id @default(autoincrement())
-  name      String
-  parentId  Int?       
-  parent    Category?  @relation("CategoryToParent", fields: [parentId], references: [id])
-  children  Category[] @relation("CategoryToParent")
-  products  Product[]
+  id          Int        @id @default(autoincrement())
+  name        String
+  slug        String     @unique
+  parentId    Int?       
+  parent      Category?  @relation("CategoryToParent", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryToParent")
+  products    Product[]
+  attributes  CategoryAttribute[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+// Атрибути, які можуть мати категорії (марка, модель, рік тощо)
+model Attribute {
+  id              Int                   @id @default(autoincrement())
+  name            String                // "Марка", "Модель", "Рік випуску"
+  slug            String                @unique // "brand", "model", "year"
+  type            AttributeType         // SELECT, TEXT, NUMBER, RANGE, BOOLEAN
+  isFilterable    Boolean               @default(true)
+  isRequired      Boolean               @default(false)
+  displayOrder    Int                   @default(0)
+  unit            String?               // "км", "л", "к.с." для числових значень
+  
+  // НОВЕ ПОЛЕ - Залежність від іншого атрибуту
+  dependsOn       Int?                  // ID батьківського атрибуту
+  dependsOnAttribute Attribute?         @relation("AttributeDependency", fields: [dependsOn], references: [id])
+  dependentAttributes Attribute[]       @relation("AttributeDependency")
+  
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  
+  // Зв'язки
+  categoryAttributes CategoryAttribute[]
+  attributeValues    AttributeValue[]
+  productAttributes  ProductAttribute[]
+}
+
+// Зв'язок між категоріями та атрибутами (які атрибути доступні в яких категоріях)
+model CategoryAttribute {
+  id          Int       @id @default(autoincrement())
+  categoryId  Int
+  attributeId Int
+  isRequired  Boolean   @default(false)
+  displayOrder Int      @default(0)
+  
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  attribute   Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  
+  @@unique([categoryId, attributeId])
+}
+
+// Можливі значення для атрибутів типу SELECT
+model AttributeValue {
+  id          Int       @id @default(autoincrement())
+  attributeId Int
+  value       String    // "BMW", "Mercedes", "2023"
+  displayName String?   // "БМВ" (для локалізації)
+  displayOrder Int      @default(0)
+  createdAt   DateTime  @default(now())
+  
+  attribute   Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  productAttributes ProductAttribute[]
 }
 
 model Product {
@@ -35,18 +90,49 @@ model Product {
   price       Float
   image       String
   categoryId  Int
-  category    Category  @relation(fields: [categoryId], references: [id])
+  isActive    Boolean   @default(true)
+  viewCount   Int       @default(0)
   createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  category    Category  @relation(fields: [categoryId], references: [id])
+  attributes  ProductAttribute[]
+}
+
+// Значення атрибутів для конкретних продуктів
+model ProductAttribute {
+  id              Int             @id @default(autoincrement())
+  productId       Int
+  attributeId     Int
+  attributeValueId Int?           // Для SELECT атрибутів
+  textValue       String?         // Для TEXT атрибутів
+  numberValue     Float?          // Для NUMBER/RANGE атрибутів
+  booleanValue    Boolean?        // Для BOOLEAN атрибутів
+  
+  product         Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attribute       Attribute       @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  attributeValue  AttributeValue? @relation(fields: [attributeValueId], references: [id])
+  
+  @@unique([productId, attributeId])
 }
 
 model BannerSlide {
-  id          Int      @id @default(autoincrement())
-  title       String?
-  subtitle    String?
-  imageUrl    String
-  linkUrl     String?
-  isActive    Boolean  @default(true)
+  id           Int      @id @default(autoincrement())
+  title        String?
+  subtitle     String?
+  imageUrl     String
+  linkUrl      String?
+  linkText     String?   
+  isActive     Boolean  @default(true)
   displayOrder Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum AttributeType {
+  SELECT      // Випадаючий список (марка, модель)
+  TEXT        // Текстове поле (VIN код, опис)
+  NUMBER      // Числове значення (пробіг, об'єм двигуна)
+  RANGE       // Діапазон (ціна від-до, рік від-до)
+  BOOLEAN     // Так/Ні (кондиціонер, ABS)
 }
