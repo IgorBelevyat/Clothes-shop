@@ -1,3 +1,5 @@
+// ОНОВЛЕНИЙ product.routes.js
+
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/product.controller.js');
@@ -8,6 +10,9 @@ const upload = require('../middlewares/upload.middleware.js');
 
 // Завантаження зображень
 router.post('/upload', verifyToken, upload.single('image'), productController.uploadImage);
+
+// НОВИЙ РОУТ: Отримати всі доступні фільтри (без категорії)
+router.get('/filters', productController.getAllFilters);
 
 // Отримати фільтри для категорії (ПЕРЕД /:id маршрутами)
 router.get('/filters/:categoryId', productController.getCategoryFilters);

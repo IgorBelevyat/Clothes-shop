@@ -1,0 +1,207 @@
+/* CatalogPagination.css */
+
+.catalog-pagination {
+  margin-top: 40px;
+  padding: 32px 0;
+  border-top: 2px solid #f8f9fa;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #2c3e50;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  text-decoration: none;
+}
+
+.pagination-btn:hover:not(.disabled) {
+  border-color: #3498db;
+  background: #3498db;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+}
+
+.pagination-btn:active:not(.disabled) {
+  transform: translateY(0);
+}
+
+.pagination-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #adb5bd;
+  border-color: #e9ecef;
+}
+
+.pagination-text {
+  font-weight: 600;
+}
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 16px;
+}
+
+.pagination-page {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #2c3e50;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-page:hover {
+  border-color: #3498db;
+  background: #f8f9fa;
+  transform: translateY(-1px);
+}
+
+.pagination-page.active {
+  border-color: #3498db;
+  background: #3498db;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.pagination-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: #7f8c8d;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pagination-info {
+  text-align: center;
+}
+
+.pagination-info-text {
+  font-size: 14px;
+  color: #6c757d;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .catalog-pagination {
+    margin-top: 32px;
+    padding: 24px 0;
+  }
+  
+  .pagination-container {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  
+  .pagination-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .pagination-text {
+    display: none;
+  }
+  
+  .pagination-pages {
+    margin: 0 12px;
+    gap: 3px;
+  }
+  
+  .pagination-page {
+    width: 40px;
+    height: 40px;
+    font-size: 13px;
+  }
+  
+  .pagination-dots {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+  
+  .pagination-info-text {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .catalog-pagination {
+    margin-top: 24px;
+    padding: 20px 0;
+  }
+  
+  .pagination-container {
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  
+  .pagination-btn {
+    padding: 8px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+  
+  .pagination-pages {
+    margin: 0 8px;
+    gap: 2px;
+  }
+  
+  .pagination-page {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+  
+  .pagination-dots {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+  
+  .pagination-info-text {
+    font-size: 12px;
+  }
+  
+  /* На дуже маленьких екранах показуємо тільки основні кнопки */
+  .pagination-pages {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .pagination-pages::-webkit-scrollbar {
+    display: none;
+  }
+}

@@ -1,0 +1,131 @@
+/* CatalogPage.css */
+
+.catalog-page {
+  min-height: 100vh;
+  font-family: 'Montserrat', sans-serif;
+  background: #ffffff;
+  padding: 20px 0 60px;
+}
+
+.catalog-wrapper {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  position: relative;
+}
+
+.catalog-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 40px;
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+/* Ліва панель фільтрів (жовтий контейнер) */
+.catalog-sidebar {
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.08);
+  border: 1px solid #f0f0f0;
+  margin-left: 20px;
+}
+
+/* Центральний контейнер (червоний контейнер) */
+.catalog-container {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.08);
+  border: 1px solid #f0f0f0;
+  margin-right: 20px;
+  min-height: 600px;
+}
+
+.catalog-content {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.catalog-main {
+  flex: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .catalog-layout {
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
+  }
+  
+  .catalog-sidebar {
+    margin-left: 16px;
+  }
+  
+  .catalog-container {
+    margin-right: 16px;
+  }
+  
+  .catalog-content {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .catalog-layout {
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+  }
+  
+  .catalog-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .catalog-page {
+    padding: 16px 0 40px;
+  }
+  
+  .catalog-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 12px;
+  }
+  
+  .catalog-sidebar {
+    position: static;
+    order: 2;
+    margin: 0;
+  }
+  
+  .catalog-container {
+    order: 1;
+    margin: 0;
+  }
+  
+  .catalog-content {
+    padding: 16px;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .catalog-page {
+    padding: 12px 0 32px;
+  }
+  
+  .catalog-layout {
+    gap: 16px;
+    padding: 0 8px;
+  }
+  
+  .catalog-content {
+    padding: 12px;
+    gap: 16px;
+  }
+}

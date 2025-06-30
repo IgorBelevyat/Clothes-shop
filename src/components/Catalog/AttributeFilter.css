@@ -1,0 +1,228 @@
+/* AttributeFilter.css */
+
+.attribute-filter {
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.attribute-filter:hover {
+  border-color: #dee2e6;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.05);
+}
+
+.filter-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-section-title svg {
+  color: #3498db;
+}
+
+.unit-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #7f8c8d;
+  margin-left: 4px;
+}
+
+/* SELECT фільтр */
+.select-filter {
+  width: 100%;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  background: #ffffff;
+  color: #2c3e50;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.filter-select:hover {
+  border-color: #bdc3c7;
+}
+
+/* BOOLEAN фільтр */
+.boolean-filter {
+  width: 100%;
+}
+
+.boolean-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #2c3e50;
+  user-select: none;
+}
+
+.boolean-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  appearance: none;
+  background: #ffffff;
+}
+
+.boolean-checkbox:checked {
+  background: #3498db;
+  border-color: #3498db;
+}
+
+.boolean-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.boolean-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.boolean-text {
+  font-weight: 500;
+}
+
+/* TEXT фільтр */
+.text-filter {
+  width: 100%;
+}
+
+.text-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  background: #ffffff;
+  color: #2c3e50;
+  transition: all 0.3s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.text-input:hover {
+  border-color: #bdc3c7;
+}
+
+.text-input::placeholder {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .attribute-filter {
+    padding: 16px;
+  }
+  
+  .filter-section-title {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  
+  .filter-select,
+  .text-input {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  
+  .filter-select {
+    padding-right: 36px;
+    background-size: 14px;
+    background-position: right 10px center;
+  }
+  
+  .boolean-filter-label {
+    font-size: 13px;
+    gap: 10px;
+  }
+  
+  .boolean-checkbox {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .boolean-checkbox:checked::after {
+    top: 1px;
+    left: 5px;
+    width: 3px;
+    height: 7px;
+  }
+}
+
+@media (max-width: 480px) {
+  .attribute-filter {
+    padding: 14px;
+  }
+  
+  .filter-section-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .unit-label {
+    font-size: 11px;
+  }
+  
+  .filter-select,
+  .text-input {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .filter-select {
+    padding-right: 32px;
+    background-size: 12px;
+    background-position: right 8px center;
+  }
+  
+  .boolean-filter-label {
+    font-size: 13px;
+    gap: 8px;
+  }
+}

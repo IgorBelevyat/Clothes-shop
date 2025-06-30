@@ -1,0 +1,268 @@
+/* СТВОРИТИ НОВИЙ ФАЙЛ: src/components/MainPage/WhyChooseUs.css */
+
+.why-choose-us {
+  padding: 60px 0;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.why-choose-us-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.why-choose-us-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #2c3e50;
+  text-align: center;
+  margin: 0 0 48px 0;
+  line-height: 1.2;
+}
+
+/* Верхняя сетка (3 карточки) */
+.advantages-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Нижняя секция */
+.advantages-bottom {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* Стили карточек преимуществ (как кнопки товаров) */
+.advantage-card {
+  background: #2c3e50;
+  color: white;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px; /* Задаємо однакову мінімальну висоту */
+}
+
+.advantage-card:hover {
+  background: #34495e;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(44, 62, 80, 0.3);
+}
+
+.advantage-icon {
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  transition: all 0.3s ease;
+  flex-shrink: 0; /* Запобігаємо стисненню іконки */
+}
+
+.advantage-card:hover .advantage-icon {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.advantage-icon svg {
+  color: white;
+}
+
+.advantage-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+  flex-shrink: 0; /* Запобігаємо стисненню заголовка */
+}
+
+.advantage-description {
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+/* Карточка консультации */
+.advantage-card.consultation-card {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #2c3e50;
+  box-shadow: 0 4px 12px rgba(241, 196, 15, 0.3);
+}
+
+.advantage-card.consultation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(241, 196, 15, 0.4);
+}
+
+.consultation-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  line-height: 1.3;
+  flex-shrink: 0;
+}
+
+.consultation-btn {
+  background: #2c3e50;
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  width: 100%;
+  max-width: 250px;
+}
+
+.consultation-btn:hover {
+  background: #34495e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .why-choose-us {
+    padding: 40px 0;
+  }
+  
+  .why-choose-us-container {
+    padding: 0 20px;
+  }
+  
+  .why-choose-us-title {
+    font-size: 28px;
+    margin-bottom: 32px;
+  }
+  
+  .advantages-grid {
+    gap: 20px;
+  }
+  
+  .advantages-bottom {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .why-choose-us {
+    padding: 32px 0;
+  }
+  
+  .why-choose-us-container {
+    padding: 0 16px;
+  }
+  
+  .why-choose-us-title {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .advantages-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .advantages-bottom {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .advantage-card {
+    padding: 20px;
+    min-height: 160px;
+  }
+  
+  .advantage-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+  }
+  
+  .advantage-title {
+    font-size: 16px;
+  }
+  
+  .advantage-description {
+    font-size: 13px;
+  }
+  
+  .consultation-title {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .why-choose-us {
+    padding: 24px 0;
+  }
+  
+  .why-choose-us-container {
+    padding: 0 12px;
+  }
+  
+  .why-choose-us-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  
+  .consultation-btn {
+    padding: 12px 20px;
+    font-size: 11px;
+  }
+  
+  .advantage-card {
+    padding: 16px;
+    min-height: 140px;
+  }
+  
+  .advantage-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+  }
+  
+  .advantage-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .advantage-title {
+    font-size: 15px;
+  }
+  
+  .advantage-description {
+    font-size: 12px;
+  }
+  
+  .consultation-title {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  
+  .consultation-btn {
+    padding: 10px 16px;
+    font-size: 10px;
+  }
+}

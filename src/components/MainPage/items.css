@@ -1,14 +1,46 @@
 /* Items.css */
 
-main {
-  display: flex;
+/* СЕКЦІЯ З ТОВАРАМИ */
+.items-section {
+  padding: 60px 0;
+  font-family: 'Montserrat', sans-serif;
+  background: #ffffff;
+}
+
+/* WRAPPER ДЛЯ ОБМЕЖЕННЯ ШИРИНИ */
+.items-wrapper {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  position: relative;
+}
+
+/* КОНТЕЙНЕР З ОБМЕЖЕНОЮ ШИРИНОЮ */
+.items-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* СТИЛІ ДЛЯ ЗАГОЛОВКА */
+.items-header {
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.items-title {
+  font-size: 36px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* СІТКА ТОВАРІВ */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 32px;
   width: 100%;
-  flex-wrap: wrap;
-  gap: 24px;
-  justify-content: center;
-  padding-top: 24px;
-  padding-bottom: 24px;
-  background-color: #f8f9fa;
 }
 
 /* Loading and Empty States */
@@ -29,19 +61,49 @@ main {
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
-  main {
-    gap: 20px;
-    padding-top: 20px;
-    padding-bottom: 20px;
+@media (max-width: 1024px) {
+  .items-section {
+    padding: 50px 0;
+  }
+  
+  .items-container {
+    padding: 0 20px;
+  }
+  
+  .items-header {
+    margin-bottom: 40px;
+  }
+  
+  .items-title {
+    font-size: 32px;
+  }
+  
+  .items-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
   }
 }
 
 @media (max-width: 768px) {
-  main {
-    gap: 16px;
-    padding: 16px;
-    background-color: #f8f9fa;
+  .items-section {
+    padding: 40px 0;
+  }
+  
+  .items-container {
+    padding: 0 16px;
+  }
+  
+  .items-header {
+    margin-bottom: 32px;
+  }
+  
+  .items-title {
+    font-size: 28px;
+  }
+  
+  .items-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
   }
   
   .items-loading,
@@ -52,13 +114,59 @@ main {
 }
 
 @media (max-width: 480px) {
-  main {
-    gap: 12px;
-    padding: 12px;
+  .items-section {
+    padding: 32px 0;
+  }
+  
+  .items-container {
+    padding: 0 12px;
+  }
+  
+  .items-header {
+    margin-bottom: 24px;
+  }
+  
+  .items-title {
+    font-size: 24px;
+  }
+  
+  .items-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
   
   .items-loading,
   .items-empty {
     padding: 20px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Забезпечуємо сумісність зі старими стилями */
+main {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 32px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  main {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  main {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 }

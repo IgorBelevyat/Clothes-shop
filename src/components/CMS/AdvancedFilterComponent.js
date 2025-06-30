@@ -1,7 +1,9 @@
+//AdvancedFilterComponent.js
+
 import React, { useState, useEffect, useCallback } from 'react';
 import './AdvancedFilterComponent.css';
 
-export default function DependentFilterComponent({ categoryId, onFiltersChange }) {
+export default function AdvancedFilterComponent({ categoryId, onFiltersChange }) {
   const [filters, setFilters] = useState({});
   const [availableFilters, setAvailableFilters] = useState([]);
   const [dependentValues, setDependentValues] = useState({});
@@ -28,11 +30,13 @@ export default function DependentFilterComponent({ categoryId, onFiltersChange }
       const res = await fetch(`http://localhost:3001/api/products/filters/${catId}`, {
         credentials: 'include'
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         console.log('Отримані фільтри:', data);
-        setAvailableFilters(data);
+
+        // Виправлено:
+        setAvailableFilters(data.filters || []);
         setDependentValues({});
         setFilters({});
       }
@@ -42,6 +46,7 @@ export default function DependentFilterComponent({ categoryId, onFiltersChange }
       setLoading(false);
     }
   };
+
 
   const fetchDependentValues = async (attributeSlug, parentValueId) => {
     try {
@@ -195,7 +200,7 @@ export default function DependentFilterComponent({ categoryId, onFiltersChange }
                   const [, max] = currentValue.split(',');
                   handleFilterChange(attr.slug, `${e.target.value},${max || ''}`, 'range');
                 }}
-                className="range-input"
+                className="cms-range-input"
               />
               <span className="range-separator">—</span>
               <input
@@ -207,7 +212,7 @@ export default function DependentFilterComponent({ categoryId, onFiltersChange }
                   const [min] = currentValue.split(',');
                   handleFilterChange(attr.slug, `${min || ''},${e.target.value}`, 'range');
                 }}
-                className="range-input"
+                className="cms-range-input"
               />
             </div>
             <div className="range-hint">

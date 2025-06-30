@@ -1,3 +1,5 @@
+//product.controller.js
+
 const prisma = require('../config/prisma.client.js');
 
 const getAllProducts = async (req, res, next) => {
@@ -7,6 +9,9 @@ const getAllProducts = async (req, res, next) => {
     price_min, 
     price_max, 
     category,
+    // НОВІ ФІЛЬТРИ
+    transmission,
+    fuelType,
     page = 1,
     limit = 20,
     sort = 'createdAt',
@@ -37,6 +42,15 @@ const getAllProducts = async (req, res, next) => {
       where.price = {};
       if (price_min) where.price.gte = parseFloat(price_min);
       if (price_max) where.price.lte = parseFloat(price_max);
+    }
+
+    // НОВІ ФІЛЬТРИ ЗА ШВИДКИМИ ХАРАКТЕРИСТИКАМИ
+    if (transmission) {
+      where.transmission = transmission;
+    }
+
+    if (fuelType) {
+      where.fuelType = fuelType;
     }
 
     // Фільтр за категорією (включаючи підкategорії)
@@ -161,6 +175,13 @@ const getAllProducts = async (req, res, next) => {
               },
               attributeValue: true
             }
+          },
+          // ДОДАНО: включення зображень
+          images: {
+            orderBy: [
+              { isMain: 'desc' },
+              { displayOrder: 'asc' }
+            ]
           }
         },
         orderBy,
@@ -189,10 +210,24 @@ const createProduct = async (req, res, next) => {
     return res.status(403).json({ error: 'Access denied' });
   }
 
-  const { title, description, price, image, categoryId, attributes } = req.body;
+  const { 
+    title, 
+    description, 
+    price, 
+    image, // Основне зображення (для зворотної сумісності)
+    images, // Множинні зображення
+    categoryId, 
+    attributes,
+    // НОВІ ПОЛЯ
+    mileage,
+    transmission,
+    wheelbase,
+    fuelType
+  } = req.body;
 
-  if (!title || !description || price === undefined || !image || categoryId === undefined) {
-    return res.status(400).json({ error: 'All fields (title, description, price, image, categoryId) are required' });
+  // ОНОВЛЕНА ВАЛІДАЦІЯ: image більше не обов'язкове
+  if (!title || !description || price === undefined || categoryId === undefined) {
+    return res.status(400).json({ error: 'Title, description, price, and categoryId are required' });
   }
 
   try {
@@ -222,16 +257,45 @@ const createProduct = async (req, res, next) => {
       }
     }
 
-    // Створюємо продукт
+    // Створюємо продукт з новими полями
     const newProduct = await prisma.product.create({
       data: {
         title,
         description,
         price: parseFloat(price),
-        image,
+        image: image || null, // Для зворотної сумісності
         categoryId: parseInt(categoryId),
+        // НОВІ ПОЛЯ
+        mileage: mileage ? mileage.trim() : null,
+        transmission: transmission ? transmission.trim() : null,
+        wheelbase: wheelbase ? wheelbase.trim() : null,
+        fuelType: fuelType ? fuelType.trim() : null,
       },
     });
+
+    // ДОДАЄМО МНОЖИННІ ЗОБРАЖЕННЯ
+    if (images && Array.isArray(images) && images.length > 0) {
+      const imageData = images.map((imageUrl, index) => ({
+        productId: newProduct.id,
+        imageUrl,
+        displayOrder: index,
+        isMain: index === 0 // Перше зображення - головне
+      }));
+
+      await prisma.productImage.createMany({
+        data: imageData
+      });
+    } else if (image) {
+      // Якщо передано тільки одне зображення (старий формат)
+      await prisma.productImage.create({
+        data: {
+          productId: newProduct.id,
+          imageUrl: image,
+          displayOrder: 0,
+          isMain: true
+        }
+      });
+    }
 
     // Додаємо атрибути продукту
     if (attributes) {
@@ -278,7 +342,7 @@ const createProduct = async (req, res, next) => {
       }
     }
 
-    // Повертаємо створений продукт з атрибутами
+    // Повертаємо створений продукт з зображеннями та атрибутами
     const createdProduct = await prisma.product.findUnique({
       where: { id: newProduct.id },
       include: {
@@ -294,6 +358,12 @@ const createProduct = async (req, res, next) => {
             },
             attributeValue: true
           }
+        },
+        images: {
+          orderBy: [
+            { isMain: 'desc' },
+            { displayOrder: 'asc' }
+          ]
         }
       }
     });
@@ -329,13 +399,27 @@ const updateProduct = async (req, res, next) => {
     return res.status(400).json({ error: 'Invalid product ID' });
   }
 
-  const { title, description, price, image, categoryId, attributes } = req.body;
+  const { 
+    title, 
+    description, 
+    price, 
+    image, 
+    images, // Дані про зображення
+    categoryId, 
+    attributes,
+    // НОВІ ПОЛЯ
+    mileage,
+    transmission,
+    wheelbase,
+    fuelType
+  } = req.body;
 
   try {
     const productToUpdate = await prisma.product.findUnique({
       where: { id: productId },
       include: {
-        attributes: true
+        attributes: true,
+        images: true
       }
     });
     
@@ -348,6 +432,12 @@ const updateProduct = async (req, res, next) => {
     if (description !== undefined) dataToUpdate.description = description;
     if (price !== undefined) dataToUpdate.price = parseFloat(price);
     if (image !== undefined) dataToUpdate.image = image;
+    
+    // НОВІ ПОЛЯ В ОНОВЛЕННІ
+    if (mileage !== undefined) dataToUpdate.mileage = mileage ? mileage.trim() : null;
+    if (transmission !== undefined) dataToUpdate.transmission = transmission ? transmission.trim() : null;
+    if (wheelbase !== undefined) dataToUpdate.wheelbase = wheelbase ? wheelbase.trim() : null;
+    if (fuelType !== undefined) dataToUpdate.fuelType = fuelType ? fuelType.trim() : null;
     
     if (categoryId !== undefined) {
       const newCategoryId = parseInt(categoryId);
@@ -364,6 +454,56 @@ const updateProduct = async (req, res, next) => {
         where: { id: productId },
         data: dataToUpdate,
       });
+    }
+
+    // ОБРОБКА ЗОБРАЖЕНЬ
+    if (images !== undefined) {
+      const { newImages, existingImages, imagesToDelete } = images;
+
+      // Видаляємо зображення, які треба видалити
+      if (imagesToDelete && imagesToDelete.length > 0) {
+        await prisma.productImage.deleteMany({
+          where: {
+            id: { in: imagesToDelete },
+            productId
+          }
+        });
+      }
+
+      // Оновлюємо існуючі зображення (порядок, isMain)
+      if (existingImages && existingImages.length > 0) {
+        for (const existingImage of existingImages) {
+          await prisma.productImage.update({
+            where: { id: existingImage.id },
+            data: {
+              isMain: existingImage.isMain || false,
+              displayOrder: existingImage.displayOrder || 0
+            }
+          });
+        }
+      }
+
+      // Додаємо нові зображення
+      if (newImages && newImages.length > 0) {
+        const maxOrder = await prisma.productImage.findFirst({
+          where: { productId },
+          orderBy: { displayOrder: 'desc' },
+          select: { displayOrder: true }
+        });
+
+        const startOrder = (maxOrder?.displayOrder || 0) + 1;
+
+        const newImageData = newImages.map((imageUrl, index) => ({
+          productId,
+          imageUrl,
+          displayOrder: startOrder + index,
+          isMain: false // Нові зображення не є головними за замовчуванням
+        }));
+
+        await prisma.productImage.createMany({
+          data: newImageData
+        });
+      }
     }
 
     // Оновлюємо атрибути
@@ -421,7 +561,7 @@ const updateProduct = async (req, res, next) => {
       }
     }
 
-    // Повертаємо оновлений продукт
+    // Повертаємо оновлений продукт з зображеннями
     const updatedProduct = await prisma.product.findUnique({
       where: { id: productId },
       include: {
@@ -437,6 +577,12 @@ const updateProduct = async (req, res, next) => {
             },
             attributeValue: true
           }
+        },
+        images: {
+          orderBy: [
+            { isMain: 'desc' },
+            { displayOrder: 'asc' }
+          ]
         }
       }
     });
@@ -465,6 +611,8 @@ const deleteProduct = async (req, res, next) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
+    // Видалення продукту автоматично видалить пов'язані зображення та атрибути
+    // завдяки onDelete: Cascade в схемі
     await prisma.product.delete({
       where: { id: productId },
     });
@@ -474,10 +622,7 @@ const deleteProduct = async (req, res, next) => {
   }
 };
 
-// Отримати фільтри для категорії
-// ОНОВИТИ в product.controller.js функцію getCategoryFilters
-// У product.controller.js ЗАМІНІТЬ функцію getCategoryFilters на цю:
-
+// Отримати фільтри для категорії з НОВИМИ ШВИДКИМИ ФІЛЬТРАМИ
 const getCategoryFilters = async (req, res, next) => {
   const categoryId = parseInt(req.params.categoryId);
 
@@ -515,6 +660,35 @@ const getCategoryFilters = async (req, res, next) => {
     };
 
     const allSubcategoryIds = await getAllSubcategories(categoryId);
+
+    // ДОДАЄМО СТАТИСТИКУ ДЛЯ НОВИХ ШВИДКИХ ФІЛЬТРІВ
+    const quickFiltersStats = {};
+
+    // Статистика для коробки передач
+    const transmissionStats = await prisma.product.groupBy({
+      by: ['transmission'],
+      where: {
+        categoryId: { in: allSubcategoryIds },
+        transmission: { not: null }
+      },
+      _count: true
+    });
+    quickFiltersStats.transmission = transmissionStats
+      .filter(item => item.transmission)
+      .map(item => ({ value: item.transmission, count: item._count }));
+
+    // Статистика для типу палива
+    const fuelTypeStats = await prisma.product.groupBy({
+      by: ['fuelType'],
+      where: {
+        categoryId: { in: allSubcategoryIds },
+        fuelType: { not: null }
+      },
+      _count: true
+    });
+    quickFiltersStats.fuelType = fuelTypeStats
+      .filter(item => item.fuelType)
+      .map(item => ({ value: item.fuelType, count: item._count }));
 
     // Обробляємо кожен фільтр та додаємо статистику
     const filtersWithStats = await Promise.all(
@@ -606,12 +780,146 @@ const getCategoryFilters = async (req, res, next) => {
       return true;
     });
 
-    res.json(validFilters);
+    // ДОДАЄМО ШВИДКІ ФІЛЬТРИ ДО ВІДПОВІДІ
+    res.json({
+      filters: validFilters,
+      quickFilters: quickFiltersStats
+    });
   } catch (err) {
     next(err);
   }
 };
 
+// ДОДАТИ ДО ІСНУЮЧОГО product.controller.js
+
+// Отримати всі доступні фільтри (для каталогу без категорії)
+const getAllFilters = async (req, res, next) => {
+  try {
+    // Отримуємо всі атрибути які використовуються як фільтри
+    const attributes = await prisma.attribute.findMany({
+      where: {
+        isFilterable: true
+      },
+      include: {
+        attributeValues: {
+          orderBy: { displayOrder: 'asc' }
+        }
+      },
+      orderBy: { displayOrder: 'asc' }
+    });
+
+    // Для кожного атрибуту збираємо статистику
+    const filtersWithStats = await Promise.all(
+      attributes.map(async (attr) => {
+        if (attr.type === 'SELECT') {
+          // Для SELECT атрибутів підраховуємо кількість товарів для кожного значення
+          const valueCounts = await Promise.all(
+            attr.attributeValues.map(async (value) => {
+              const count = await prisma.product.count({
+                where: {
+                  attributes: {
+                    some: {
+                      attributeValueId: value.id
+                    }
+                  }
+                }
+              });
+              return { ...value, count };
+            })
+          );
+          
+          return {
+            attribute: {
+              ...attr,
+              attributeValues: valueCounts.filter(v => v.count > 0)
+            }
+          };
+        } else if (attr.type === 'NUMBER' || attr.type === 'RANGE') {
+          // Для числових атрибутів знаходимо мін/макс значення
+          const stats = await prisma.productAttribute.aggregate({
+            where: {
+              attributeId: attr.id,
+              numberValue: { not: null }
+            },
+            _min: { numberValue: true },
+            _max: { numberValue: true }
+          });
+          
+          if (stats._min.numberValue !== null && stats._max.numberValue !== null) {
+            return {
+              attribute: {
+                ...attr,
+                minValue: stats._min.numberValue,
+                maxValue: stats._max.numberValue
+              }
+            };
+          }
+        } else if (attr.type === 'TEXT' || attr.type === 'BOOLEAN') {
+          // Для TEXT і BOOLEAN перевіряємо наявність товарів
+          const hasProducts = await prisma.product.count({
+            where: {
+              attributes: {
+                some: {
+                  attributeId: attr.id
+                }
+              }
+            }
+          });
+          
+          if (hasProducts > 0) {
+            return {
+              attribute: {
+                ...attr,
+                hasProducts: true
+              }
+            };
+          }
+        }
+        
+        return null;
+      })
+    );
+
+    // Фільтруємо тільки ті атрибути, які мають релевантні дані
+    const validFilters = filtersWithStats.filter(f => f !== null);
+
+    // ДОДАЄМО ШВИДКІ ФІЛЬТРИ ДЛЯ ВСІХ ТОВАРІВ
+    const quickFiltersStats = {};
+
+    // Статистика для коробки передач
+    const transmissionStats = await prisma.product.groupBy({
+      by: ['transmission'],
+      where: {
+        transmission: { not: null }
+      },
+      _count: true
+    });
+    quickFiltersStats.transmission = transmissionStats
+      .filter(item => item.transmission)
+      .map(item => ({ value: item.transmission, count: item._count }));
+
+    // Статистика для типу палива
+    const fuelTypeStats = await prisma.product.groupBy({
+      by: ['fuelType'],
+      where: {
+        fuelType: { not: null }
+      },
+      _count: true
+    });
+    quickFiltersStats.fuelType = fuelTypeStats
+      .filter(item => item.fuelType)
+      .map(item => ({ value: item.fuelType, count: item._count }));
+
+    res.json({
+      filters: validFilters,
+      quickFilters: quickFiltersStats
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ОНОВИТИ exports щоб включити новий метод
 module.exports = {
   createProduct,
   getAllProducts,
@@ -619,4 +927,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getCategoryFilters,
+  getAllFilters, // НОВИЙ МЕТОД
 };

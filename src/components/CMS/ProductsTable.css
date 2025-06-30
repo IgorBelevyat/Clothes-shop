@@ -1,4 +1,4 @@
-/* ProductsTable.css */
+/* ПОВНІСТЮ ЗАМІНИТИ ProductsTable.css */
 
 .products-table-container {
   margin-left: 20px;
@@ -63,10 +63,11 @@
   box-shadow: inset 0 0 0 2px #007bff;
 }
 
-/* Image Cells */
+/* Image Cells - ОНОВЛЕНО ДЛЯ МНОЖИННИХ ЗОБРАЖЕНЬ */
 .product-image-cell {
-  width: 80px;
+  width: 120px;
   text-align: center;
+  max-width: 120px;
 }
 
 .product-image,
@@ -88,6 +89,13 @@
 .image-input {
   font-size: 10px;
   width: 100%;
+}
+
+/* НОВІ СТИЛІ ДЛЯ ШВИДКИХ ХАРАКТЕРИСТИК */
+.quick-specs-cell {
+  width: 140px;
+  max-width: 140px;
+  font-size: 11px;
 }
 
 /* Form Inputs */
@@ -245,6 +253,182 @@
   font-weight: 500;
 }
 
+/* НОВІ СТИЛІ ДЛЯ ГАЛЕРЕЇ ЗОБРАЖЕНЬ */
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 120px;
+}
+
+.image-thumbnail {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.image-thumbnail.main {
+  border: 2px solid #007bff;
+  width: 60px;
+  height: 60px;
+}
+
+.image-count-badge {
+  width: 28px;
+  height: 28px;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* СТИЛІ ДЛЯ ФОРМ РЕДАГУВАННЯ */
+.edit-form-section {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.edit-form-section.quick-specs {
+  background-color: #f0f8ff;
+  border-color: #b8daff;
+}
+
+.edit-form-section.images {
+  background-color: #fff5f5;
+  border-color: #f8d7da;
+}
+
+.edit-form-section.attributes {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+.edit-form-title {
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: #495057;
+}
+
+.edit-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.edit-form-field {
+  margin-bottom: 8px;
+}
+
+.edit-form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #495057;
+}
+
+.edit-form-input,
+.edit-form-select {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: "Montserrat", sans-serif;
+}
+
+/* СТИЛІ ДЛЯ УПРАВЛІННЯ ЗОБРАЖЕННЯМИ */
+.image-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.image-item {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.image-item.main {
+  border: 2px solid #007bff;
+}
+
+.image-item.new {
+  border: 2px solid #28a745;
+}
+
+.image-preview {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  display: block;
+}
+
+.image-controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.image-control-btn {
+  padding: 2px 4px;
+  border: none;
+  border-radius: 3px;
+  font-size: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.image-control-btn.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.image-control-btn.main {
+  background-color: #007bff;
+  color: white;
+}
+
+.image-control-btn.set-main {
+  background-color: #6c757d;
+  color: white;
+}
+
+.image-upload-input {
+  padding: 8px;
+  border: 2px dashed #ced4da;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.image-upload-input:hover {
+  border-color: #007bff;
+}
+
 /* 📱 RESPONSIVE DESIGN */
 
 /* Планшеты (768px - 1024px) */
@@ -260,6 +444,11 @@
     font-size: 13px;
   }
   
+  .product-image-cell {
+    width: 100px;
+    max-width: 100px;
+  }
+  
   .product-image,
   .product-image-preview {
     width: 50px;
@@ -273,6 +462,11 @@
   .attributes-cell {
     max-width: 140px;
     font-size: 11px;
+  }
+  
+  .quick-specs-cell {
+    width: 120px;
+    max-width: 120px;
   }
 }
 
@@ -322,8 +516,9 @@
     border: none;
     padding: 8px 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
+    gap: 10px;
   }
   
   .products-table td:before {
@@ -332,10 +527,11 @@
     color: #333;
     flex-basis: 30%;
     font-size: 12px;
+    flex-shrink: 0;
   }
   
   .product-image-cell:before {
-    content: "Image:";
+    content: "Images:";
   }
   
   .products-table td:nth-child(2):before {
@@ -355,15 +551,20 @@
   }
   
   .products-table td:nth-child(6):before {
-    content: "Attributes:";
+    content: "Quick Specs:";
   }
   
   .products-table td:nth-child(7):before {
+    content: "Attributes:";
+  }
+  
+  .products-table td:nth-child(8):before {
     content: "Actions:";
   }
   
   .description-cell,
-  .attributes-cell {
+  .attributes-cell,
+  .quick-specs-cell {
     max-width: none;
   }
   
@@ -385,6 +586,20 @@
   
   .category-selector select {
     width: 100%;
+  }
+  
+  /* Адаптивна сітка для форм редагування */
+  .edit-form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .image-grid {
+    gap: 4px;
+  }
+  
+  .image-preview {
+    width: 40px;
+    height: 40px;
   }
 }
 
@@ -453,6 +668,21 @@
     width: 100%;
     text-align: center;
   }
+  
+  /* Мобільні стилі для зображень */
+  .image-preview {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .image-grid {
+    gap: 3px;
+  }
+  
+  .image-control-btn {
+    font-size: 7px;
+    padding: 1px 3px;
+  }
 }
 
 /* Очень маленькие экраны (320px и меньше) */
@@ -479,6 +709,11 @@
     width: 35px;
     height: 35px;
   }
+  
+  .image-preview {
+    width: 30px;
+    height: 30px;
+  }
 }
 
 /* Ландшафтная ориентация мобильных */
@@ -492,5 +727,9 @@
     flex-basis: 25%;
     margin-bottom: 0;
     margin-right: 10px;
+  }
+  
+  .edit-form-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }

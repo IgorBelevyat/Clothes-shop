@@ -1,0 +1,153 @@
+/* PriceFilter.css */
+
+.price-filter {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.filter-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-icon {
+  color: #3498db;
+}
+
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.price-input-group {
+  flex: 1;
+  position: relative;
+}
+
+.price-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  background: #ffffff;
+  color: #2c3e50;
+  transition: all 0.3s ease;
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.price-input:hover {
+  border-color: #bdc3c7;
+}
+
+.price-label {
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  background: #f8f9fa;
+  padding: 0 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.price-separator {
+  font-size: 16px;
+  font-weight: 600;
+  color: #7f8c8d;
+  flex-shrink: 0;
+}
+
+.price-display {
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.price-range-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .price-filter {
+    padding: 16px;
+  }
+  
+  .filter-section-title {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  
+  .price-inputs {
+    gap: 8px;
+  }
+  
+  .price-input {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  .price-label {
+    font-size: 10px;
+    left: 10px;
+  }
+  
+  .price-separator {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .price-filter {
+    padding: 14px;
+  }
+  
+  .filter-section-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  
+  .price-inputs {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .price-separator {
+    display: none;
+  }
+  
+  .price-input {
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  .price-display {
+    padding: 6px 10px;
+  }
+  
+  .price-range-text {
+    font-size: 12px;
+  }
+}

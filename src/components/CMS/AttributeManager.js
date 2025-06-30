@@ -1,3 +1,5 @@
+//AttributeManager.js
+
 import React, { useState, useEffect } from 'react';
 import './AttributeManager.css';
 

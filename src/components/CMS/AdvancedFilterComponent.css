@@ -186,7 +186,7 @@
   align-items: center;
 }
 
-.range-input {
+.cms-range-input {
   flex: 1;
   width: 100%;
   padding: 12px 16px;
@@ -197,7 +197,7 @@
   background-color: white;
 }
 
-.range-input:focus {
+.cms-range-input:focus {
   border-color: #007bff;
   outline: none;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
