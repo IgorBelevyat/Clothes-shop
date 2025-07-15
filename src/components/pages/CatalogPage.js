@@ -1,11 +1,11 @@
-// CatalogPage.js
-
 import React, { Component } from 'react';
 import CatalogFilters from '../Catalog/CatalogFilters';
 import CatalogGrid from '../Catalog/CatalogGrid';
 import CatalogHeader from '../Catalog/CatalogHeader';
 import CatalogPagination from '../Catalog/CatalogPagination';
 import '../Catalog/CatalogPage.css';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 export class CatalogPage extends Component {
   constructor(props) {
@@ -15,12 +15,8 @@ export class CatalogPage extends Component {
       categories: [],
       loading: false,
       error: '',
-      
-      // Фільтри
       selectedCategoryId: '',
       currentFilters: {},
-      
-      // Пагінація та сортування
       pagination: {
         page: 1,
         limit: 20,
@@ -29,8 +25,6 @@ export class CatalogPage extends Component {
       },
       sortBy: 'createdAt',
       sortOrder: 'desc',
-      
-      // Доступні фільтри для поточної категорії
       availableFilters: []
     };
   }
@@ -42,14 +36,12 @@ export class CatalogPage extends Component {
 
   fetchCategories = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/categories', {
+      const res = await fetch(`${API_URL}/api/categories`, {
         credentials: 'include'
       });
-      
-      if (!res.ok) {
-        throw new Error('Failed to fetch categories');
-      }
-      
+
+      if (!res.ok) throw new Error('Failed to fetch categories');
+
       const data = await res.json();
       this.setState({ categories: data });
     } catch (err) {
@@ -59,11 +51,10 @@ export class CatalogPage extends Component {
 
   fetchProducts = async () => {
     this.setState({ loading: true, error: '' });
-    
+
     try {
       const { currentFilters, pagination, selectedCategoryId, sortBy, sortOrder } = this.state;
-      
-      // Формуємо параметри запиту
+
       const params = new URLSearchParams({
         page: pagination.page,
         limit: pagination.limit,
@@ -76,16 +67,14 @@ export class CatalogPage extends Component {
         params.set('category', selectedCategoryId);
       }
 
-      const res = await fetch(`http://localhost:3001/api/products?${params.toString()}`, {
+      const res = await fetch(`${API_URL}/api/products?${params.toString()}`, {
         credentials: 'include'
       });
-      
-      if (!res.ok) {
-        throw new Error('Failed to fetch products');
-      }
-      
+
+      if (!res.ok) throw new Error('Failed to fetch products');
+
       const data = await res.json();
-      
+
       this.setState({
         products: data.products || data,
         pagination: {
@@ -109,10 +98,10 @@ export class CatalogPage extends Component {
     }
 
     try {
-      const res = await fetch(`http://localhost:3001/api/products/filters/${categoryId}`, {
+      const res = await fetch(`${API_URL}/api/products/filters/${categoryId}`, {
         credentials: 'include'
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         this.setState({ availableFilters: data.filters || [] });
@@ -125,7 +114,7 @@ export class CatalogPage extends Component {
   handleCategoryChange = (categoryId) => {
     this.setState({
       selectedCategoryId: categoryId,
-      currentFilters: {}, // Очищуємо фільтри при зміні категорії
+      currentFilters: {},
       pagination: { ...this.state.pagination, page: 1 }
     }, () => {
       this.fetchAvailableFilters(categoryId);
@@ -184,10 +173,7 @@ export class CatalogPage extends Component {
     return (
       <div className="catalog-page">
         <div className="catalog-wrapper">
-        
           <div className="catalog-layout">
-            
-            {/* Ліва панель з фільтрами (жовтий контейнер) */}
             <aside className="catalog-sidebar">
               <CatalogFilters
                 categoryId={selectedCategoryId}
@@ -196,10 +182,8 @@ export class CatalogPage extends Component {
               />
             </aside>
 
-            {/* Центральний контейнер (червоний контейнер) */}
             <div className="catalog-container">
               <div className="catalog-content">
-                {/* Заголовок каталогу */}
                 <CatalogHeader
                   categories={categories}
                   selectedCategoryId={selectedCategoryId}
@@ -212,7 +196,6 @@ export class CatalogPage extends Component {
                   onLimitChange={this.handleLimitChange}
                 />
 
-                {/* Сітка товарів */}
                 <main className="catalog-main">
                   <CatalogGrid
                     products={products}
@@ -221,7 +204,6 @@ export class CatalogPage extends Component {
                     onShowItem={this.props.onShowItem}
                   />
 
-                  {/* Пагінація */}
                   {pagination.totalPages > 1 && (
                     <CatalogPagination
                       currentPage={pagination.page}
