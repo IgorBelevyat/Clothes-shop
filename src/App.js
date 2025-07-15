@@ -1,4 +1,5 @@
 // ОНОВЛЕНИЙ App.js - чистий з page компонентами
+const API_URL = process.env.REACT_APP_API_URL;
 
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -38,7 +39,7 @@ class App extends React.Component {
 
   componentDidMount() {
     // API запити залишаються такими ж
-    fetch('http://localhost:3001/api/products')
+    fetch('${API_URL}/api/products')
       .then(res => res.json())
       .then(data => {
         const products = data.products || data;
@@ -52,7 +53,7 @@ class App extends React.Component {
         this.setState({ items: [], currentItems: [] });
       });
 
-    fetch('http://localhost:3001/api/categories')
+    fetch('${API_URL}/api/categories')
       .then(res => res.json())
       .then(data => {
         this.setState({ categories: Array.isArray(data) ? data : [] });
@@ -67,13 +68,13 @@ class App extends React.Component {
     if (savedUser) {
       try {
         this.setState({ user: JSON.parse(savedUser) });
-        fetch('http://localhost:3001/api/auth/me', { credentials: 'include' })
+        fetch('${API_URL}/api/auth/me', { credentials: 'include' })
           .then(res => { if (!res.ok) this.setState({ user: null }); });
       } catch (e) {
         localStorage.removeItem('user');
       }
     } else {
-      fetch('http://localhost:3001/api/auth/me', { credentials: 'include' })
+      fetch('${API_URL}/api/auth/me', { credentials: 'include' })
         .then(res => res.ok ? res.json() : null)
         .then(data => {
           if (data) {
@@ -88,7 +89,7 @@ class App extends React.Component {
   handleLogout() {
     this.setState({ user: null });
     localStorage.removeItem('user');
-    fetch('http://localhost:3001/api/auth/logout', {
+    fetch('${API_URL}/api/auth/logout', {
       method: 'POST',
       credentials: 'include',
     });

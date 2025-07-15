@@ -9,8 +9,20 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://demo-shop-chi.vercel.app', // замени на свой Vercel домен
+  process.env.FRONTEND_URL // чтобы можно было задавать в .env
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000', 
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

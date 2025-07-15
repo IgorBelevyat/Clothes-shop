@@ -26,6 +26,8 @@ export default function AddProductForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const API_URL = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -43,7 +45,7 @@ export default function AddProductForm() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:3001/api/categories', {
+      const res = await fetch(`${API_URL}/api/categories`, {
         credentials: 'include'
       });
       if (!res.ok) {
@@ -61,7 +63,7 @@ export default function AddProductForm() {
 
   const fetchCategoryAttributes = async (catId) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/categories/${catId}/attributes`, {
+      const res = await fetch(`${API_URL}/api/categories/${catId}/attributes`, {
         credentials: 'include'
       });
       if (!res.ok) {
@@ -69,13 +71,13 @@ export default function AddProductForm() {
       }
       const data = await res.json();
       setCategoryAttributes(data);
-      
       setAttributeValues({});
     } catch (err) {
       console.error("Error fetching category attributes:", err);
       setCategoryAttributes([]);
     }
   };
+
 
   // НОВІ ФУНКЦІЇ ДЛЯ РОБОТИ З МНОЖИННИМИ ЗОБРАЖЕННЯМИ
   const handleMultipleFileChange = (e) => {
@@ -232,6 +234,7 @@ export default function AddProductForm() {
     }
   };
 
+
   const uploadImages = async () => {
     if (imageFiles.length === 0) return [];
     
@@ -242,7 +245,7 @@ export default function AddProductForm() {
       formData.append('image', file);
       
       try {
-        const uploadRes = await fetch('http://localhost:3001/api/products/upload', {
+        const uploadRes = await fetch(`${API_URL}/api/products/upload`, {
           method: 'POST',
           credentials: 'include',
           body: formData,
@@ -262,6 +265,7 @@ export default function AddProductForm() {
     
     return uploadedUrls;
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -305,7 +309,7 @@ export default function AddProductForm() {
         fuelType: fuelType.trim() || null
       };
       
-      const productRes = await fetch('http://localhost:3001/api/products', {
+      const productRes = await fetch(`${API_URL}/api/products`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

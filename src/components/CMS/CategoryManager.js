@@ -22,11 +22,13 @@ export default function CategoryManager() {
     fetchCategories();
   }, []);
 
+  const API_URL = process.env.REACT_APP_API_URL;
+
   const fetchCategories = async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:3001/api/categories', {
+      const res = await fetch(`${API_URL}/api/categories`, {
         credentials: 'include'
       });
       if (!res.ok) {
@@ -44,12 +46,10 @@ export default function CategoryManager() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim()) {
-      return;
-    }
+    if (!name.trim()) return;
 
     try {
-      const res = await fetch('http://localhost:3001/api/categories', {
+      const res = await fetch(`${API_URL}/api/categories`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -61,7 +61,7 @@ export default function CategoryManager() {
         throw new Error(errorData.error || 'Failed to add category');
       }
 
-      await res.json(); 
+      await res.json();
       alert('Category added successfully!');
       setName('');
       setParentId('');
@@ -72,15 +72,12 @@ export default function CategoryManager() {
     }
   };
 
-
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    if (!editName.trim()) {
-      return;
-    }
+    if (!editName.trim()) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/api/categories/${editMode}`, {
+      const res = await fetch(`${API_URL}/api/categories/${editMode}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -102,22 +99,17 @@ export default function CategoryManager() {
     }
   };
 
-
   const handleMoveSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-
       const finalParentId = moveParentId === '' ? null : moveParentId;
-      
 
-      const res = await fetch(`http://localhost:3001/api/categories/${moveMode}`, {
+      const res = await fetch(`${API_URL}/api/categories/${moveMode}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          parentId: finalParentId
-        })
+        body: JSON.stringify({ parentId: finalParentId })
       });
 
       if (!res.ok) {
@@ -138,28 +130,26 @@ export default function CategoryManager() {
   const handleDeleteClick = async (categoryId) => {
     setDeleteError('');
     setAttachedProducts([]);
-    
-    try {
 
+    try {
       const hasSubcategories = checkForSubcategories(categoryId, categories);
-      
+
       if (hasSubcategories) {
         setDeleteError('Cannot delete category with subcategories. Please delete all subcategories first.');
         setDeleteConfirm(categoryId);
         return;
       }
-      
 
-      const res = await fetch(`http://localhost:3001/api/categories/${categoryId}/products`, {
+      const res = await fetch(`${API_URL}/api/categories/${categoryId}/products`, {
         credentials: 'include'
       });
-      
+
       if (!res.ok) {
         throw new Error('Failed to check products');
       }
-      
+
       const products = await res.json();
-      
+
       if (products.length > 0) {
         setAttachedProducts(products);
         setDeleteConfirm(categoryId);
@@ -172,14 +162,12 @@ export default function CategoryManager() {
     }
   };
 
-
   const checkForSubcategories = (categoryId, categoryList) => {
     for (const category of categoryList) {
       if (category.id === categoryId) {
         return category.children && category.children.length > 0;
       }
-      
-      if (category.children && category.children.length > 0) {
+      if (category.children?.length > 0) {
         const hasSubcats = checkForSubcategories(categoryId, category.children);
         if (hasSubcats) return true;
       }
@@ -189,7 +177,7 @@ export default function CategoryManager() {
 
   const confirmDelete = async (categoryId) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/categories/${categoryId}`, {
+      const res = await fetch(`${API_URL}/api/categories/${categoryId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -210,6 +198,7 @@ export default function CategoryManager() {
       setAttachedProducts([]);
     }
   };
+
 
   const cancelDelete = () => {
     setDeleteConfirm(null);

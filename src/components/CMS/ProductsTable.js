@@ -31,6 +31,8 @@ export default function ProductsTable() {
     totalPages: 0
   });
   
+  const API_URL = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
     fetchCategories();
     fetchProducts();
@@ -43,7 +45,6 @@ export default function ProductsTable() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      // Формуємо параметри запиту
       const params = new URLSearchParams({
         page: pagination.page,
         limit: pagination.limit,
@@ -54,18 +55,17 @@ export default function ProductsTable() {
         params.set('category', selectedCategoryId);
       }
 
-      const res = await fetch(`http://localhost:3001/api/products?${params.toString()}`, {
+      const res = await fetch(`${API_URL}/api/products?${params.toString()}`, {
         credentials: 'include'
       });
-      
+
       if (!res.ok) {
         throw new Error('Failed to fetch products');
       }
-      
+
       const data = await res.json();
       setProducts(data.products || data);
-      
-      // Якщо є мета-дані пагінації
+
       if (data.meta) {
         setPagination(prev => ({
           ...prev,
@@ -73,7 +73,7 @@ export default function ProductsTable() {
           totalPages: data.meta.totalPages
         }));
       }
-      
+
       setFilteredProducts(data.products || data);
     } catch (err) {
       console.error("Error fetching products:", err);
@@ -85,14 +85,14 @@ export default function ProductsTable() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/categories', {
+      const res = await fetch(`${API_URL}/api/categories`, {
         credentials: 'include'
       });
-      
+
       if (!res.ok) {
         throw new Error('Failed to fetch categories');
       }
-      
+
       const data = await res.json();
       setCategories(data);
     } catch (err) {
@@ -102,15 +102,14 @@ export default function ProductsTable() {
 
   const fetchCategoryAttributes = async (categoryId) => {
     try {
-      // Використовуємо новий ендпоінт для отримання атрибутів з батьківських категорій
-      const res = await fetch(`http://localhost:3001/api/attributes/category/${categoryId}/with-parents`, {
+      const res = await fetch(`${API_URL}/api/attributes/category/${categoryId}/with-parents`, {
         credentials: 'include'
       });
-      
+
       if (!res.ok) {
         throw new Error('Failed to fetch category attributes');
       }
-      
+
       const data = await res.json();
       setCategoryAttributes(data);
     } catch (err) {
@@ -118,6 +117,7 @@ export default function ProductsTable() {
       setCategoryAttributes([]);
     }
   };
+
 
   const handleFiltersChange = useCallback((filters) => {
     setCurrentFilters(filters);
@@ -287,16 +287,16 @@ export default function ProductsTable() {
       formData.append('image', file);
       
       try {
-        const res = await fetch('http://localhost:3001/api/products/upload', {
+        const res = await fetch(`${API_URL}/api/products/upload`, {
           method: 'POST',
           credentials: 'include',
           body: formData
         });
-        
+
         if (!res.ok) {
           throw new Error('Image upload failed');
         }
-        
+
         const data = await res.json();
         uploadedUrls.push(data.url);
       } catch (err) {
@@ -328,7 +328,7 @@ export default function ProductsTable() {
         images: imageData
       };
       
-      const res = await fetch(`http://localhost:3001/api/products/${tempProduct.id}`, {
+      const res = await fetch(`${API_URL}/api/products/${tempProduct.id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -355,7 +355,7 @@ export default function ProductsTable() {
     }
     
     try {
-      const res = await fetch(`http://localhost:3001/api/products/${productId}`, {
+      const res = await fetch(`${API_URL}/api/products/${productId}`, {
         method: 'DELETE',
         credentials: 'include'
       });

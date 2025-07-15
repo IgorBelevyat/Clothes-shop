@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './AdvancedFilterComponent.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 export default function AdvancedFilterComponent({ categoryId, onFiltersChange }) {
   const [filters, setFilters] = useState({});
   const [availableFilters, setAvailableFilters] = useState([]);
@@ -27,15 +29,13 @@ export default function AdvancedFilterComponent({ categoryId, onFiltersChange })
   const fetchAvailableFilters = async (catId) => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:3001/api/products/filters/${catId}`, {
+      const res = await fetch(`${API_URL}/api/products/filters/${catId}`, {
         credentials: 'include'
       });
 
       if (res.ok) {
         const data = await res.json();
         console.log('Отримані фільтри:', data);
-
-        // Виправлено:
         setAvailableFilters(data.filters || []);
         setDependentValues({});
         setFilters({});
@@ -47,13 +47,12 @@ export default function AdvancedFilterComponent({ categoryId, onFiltersChange })
     }
   };
 
-
   const fetchDependentValues = async (attributeSlug, parentValueId) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/attributes/dependent/${attributeSlug}/parent/${parentValueId}`, {
+      const res = await fetch(`${API_URL}/api/attributes/dependent/${attributeSlug}/parent/${parentValueId}`, {
         credentials: 'include'
       });
-      
+
       if (res.ok) {
         const values = await res.json();
         setDependentValues(prev => ({

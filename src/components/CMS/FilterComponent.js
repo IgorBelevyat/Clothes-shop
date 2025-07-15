@@ -13,9 +13,10 @@ function FilterComponent({ filters, onFilterChange }) {
 
 
   useEffect(() => {
+    const API_URL = process.env.REACT_APP_API_URL;
 
     if (filters.category) {
-      fetch('http://localhost:3001/api/categories', {
+      fetch(`${API_URL}/api/categories`, {
         credentials: 'include'
       })
         .then((response) => response.json())
@@ -23,6 +24,7 @@ function FilterComponent({ filters, onFilterChange }) {
         .catch(err => console.error("Error fetching categories:", err));
     }
   }, [filters.category]);
+
 
 
   const handleChange = (field, value) => {

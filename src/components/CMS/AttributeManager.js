@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import './AttributeManager.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 export default function AttributeManager() {
   const [attributes, setAttributes] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -48,7 +50,7 @@ export default function AttributeManager() {
   const fetchAttributes = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/attributes', {
+      const res = await fetch(`${API_URL}/api/attributes`, {
         credentials: 'include'
       });
       if (res.ok) {
@@ -64,7 +66,7 @@ export default function AttributeManager() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/categories', {
+      const res = await fetch(`${API_URL}/api/categories`, {
         credentials: 'include'
       });
       if (res.ok) {
@@ -78,7 +80,6 @@ export default function AttributeManager() {
 
   const handleCreateAttribute = async () => {
     try {
-      // Визначаємо наступний displayOrder
       const maxOrder = Math.max(...attributes.map(a => a.displayOrder || 0), 0);
       const attributeData = {
         ...attributeForm,
@@ -86,7 +87,7 @@ export default function AttributeManager() {
         dependsOn: attributeForm.dependsOn
       };
 
-      const res = await fetch('http://localhost:3001/api/attributes', {
+      const res = await fetch(`${API_URL}/api/attributes`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -96,14 +97,7 @@ export default function AttributeManager() {
       if (res.ok) {
         alert('Атрибут створено успішно!');
         setAttributeForm({
-          name: '',
-          slug: '',
-          type: 'SELECT',
-          isFilterable: true,
-          isRequired: false,
-          unit: '',
-          displayOrder: 0,
-          dependsOn: null
+          name: '', slug: '', type: 'SELECT', isFilterable: true, isRequired: false, unit: '', displayOrder: 0, dependsOn: null
         });
         fetchAttributes();
       } else {
@@ -115,76 +109,51 @@ export default function AttributeManager() {
     }
   };
 
-  // Змінити порядок атрибуту
   const moveAttribute = async (attributeId, direction) => {
     const currentIndex = attributes.findIndex(a => a.id === attributeId);
     if (currentIndex === -1) return;
-
     const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
     if (newIndex < 0 || newIndex >= attributes.length) return;
-
     const sortedAttributes = [...attributes];
     const [movedItem] = sortedAttributes.splice(currentIndex, 1);
     sortedAttributes.splice(newIndex, 0, movedItem);
-
-    // Оновлюємо displayOrder для всіх атрибутів
-    const updates = sortedAttributes.map((attr, index) => ({
-      id: attr.id,
-      displayOrder: index + 1
-    }));
+    const updates = sortedAttributes.map((attr, index) => ({ id: attr.id, displayOrder: index + 1 }));
 
     try {
-      const res = await fetch('http://localhost:3001/api/attributes/reorder', {
+      const res = await fetch(`${API_URL}/api/attributes/reorder`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ updates })
       });
-
-      if (res.ok) {
-        fetchAttributes();
-      } else {
-        alert('Помилка зміни порядку');
-      }
+      if (res.ok) fetchAttributes();
+      else alert('Помилка зміни порядку');
     } catch (err) {
       alert('Помилка зміни порядку');
     }
   };
 
-  // Змінити порядок значення атрибуту
   const moveAttributeValue = async (attributeId, valueId, direction) => {
     const attribute = attributes.find(a => a.id === attributeId);
     if (!attribute || !attribute.attributeValues) return;
-
     const values = [...attribute.attributeValues];
     const currentIndex = values.findIndex(v => v.id === valueId);
     if (currentIndex === -1) return;
-
     const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
     if (newIndex < 0 || newIndex >= values.length) return;
-
     const [movedItem] = values.splice(currentIndex, 1);
     values.splice(newIndex, 0, movedItem);
-
-    // Оновлюємо displayOrder для всіх значень
-    const updates = values.map((value, index) => ({
-      id: value.id,
-      displayOrder: index + 1
-    }));
+    const updates = values.map((value, index) => ({ id: value.id, displayOrder: index + 1 }));
 
     try {
-      const res = await fetch('http://localhost:3001/api/attributes/values/reorder', {
+      const res = await fetch(`${API_URL}/api/attributes/values/reorder`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ updates })
       });
-
-      if (res.ok) {
-        fetchAttributes();
-      } else {
-        alert('Помилка зміни порядку значень');
-      }
+      if (res.ok) fetchAttributes();
+      else alert('Помилка зміни порядку значень');
     } catch (err) {
       alert('Помилка зміни порядку значень');
     }
@@ -192,7 +161,7 @@ export default function AttributeManager() {
 
   const handleUpdateAttribute = async (attributeId, updatedData) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/attributes/${attributeId}`, {
+      const res = await fetch(`${API_URL}/api/attributes/${attributeId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -213,16 +182,13 @@ export default function AttributeManager() {
   };
 
   const handleDeleteAttribute = async (attributeId) => {
-    if (!window.confirm('Ви впевнені, що хочете видалити цей атрибут? Це також видалить всі його значення.')) {
-      return;
-    }
+    if (!window.confirm('Ви впевнені, що хочете видалити цей атрибут?')) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/api/attributes/${attributeId}`, {
+      const res = await fetch(`${API_URL}/api/attributes/${attributeId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
-
       if (res.ok) {
         alert('Атрибут видалено успішно!');
         fetchAttributes();
@@ -237,34 +203,19 @@ export default function AttributeManager() {
 
   const handleAddValue = async () => {
     if (!valueForm.attributeId || !valueForm.value) return;
-
     try {
-      // Визначаємо наступний displayOrder для значень цього атрибуту
       const attribute = attributes.find(a => a.id === parseInt(valueForm.attributeId));
-      const maxOrder = attribute?.attributeValues ? 
-        Math.max(...attribute.attributeValues.map(v => v.displayOrder || 0), 0) : 0;
-
-      const valueData = {
-        value: valueForm.value,
-        displayName: valueForm.displayName,
-        displayOrder: maxOrder + 1
-      };
-
-      const res = await fetch(`http://localhost:3001/api/attributes/${valueForm.attributeId}/values`, {
+      const maxOrder = attribute?.attributeValues ? Math.max(...attribute.attributeValues.map(v => v.displayOrder || 0), 0) : 0;
+      const valueData = { value: valueForm.value, displayName: valueForm.displayName, displayOrder: maxOrder + 1 };
+      const res = await fetch(`${API_URL}/api/attributes/${valueForm.attributeId}/values`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(valueData)
       });
-
       if (res.ok) {
         alert('Значення додано успішно!');
-        setValueForm({
-          attributeId: '',
-          value: '',
-          displayName: '',
-          displayOrder: 0
-        });
+        setValueForm({ attributeId: '', value: '', displayName: '', displayOrder: 0 });
         fetchAttributes();
       } else {
         const errorData = await res.json();
@@ -276,16 +227,12 @@ export default function AttributeManager() {
   };
 
   const handleDeleteValue = async (valueId) => {
-    if (!window.confirm('Ви впевнені, що хочете видалити це значення?')) {
-      return;
-    }
-
+    if (!window.confirm('Ви впевнені, що хочете видалити це значення?')) return;
     try {
-      const res = await fetch(`http://localhost:3001/api/attributes/values/${valueId}`, {
+      const res = await fetch(`${API_URL}/api/attributes/values/${valueId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
-
       if (res.ok) {
         alert('Значення видалено успішно!');
         fetchAttributes();
@@ -300,16 +247,12 @@ export default function AttributeManager() {
 
   const handleUpdateValue = async (valueId, newValue, newDisplayName) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/attributes/values/${valueId}`, {
+      const res = await fetch(`${API_URL}/api/attributes/values/${valueId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          value: newValue,
-          displayName: newDisplayName
-        })
+        body: JSON.stringify({ value: newValue, displayName: newDisplayName })
       });
-
       if (res.ok) {
         alert('Значення оновлено успішно!');
         setEditingValue(null);
@@ -325,23 +268,16 @@ export default function AttributeManager() {
 
   const handleAssignToCategory = async () => {
     if (!assignForm.categoryId || !assignForm.attributeId) return;
-
     try {
-      const res = await fetch('http://localhost:3001/api/attributes/assign', {
+      const res = await fetch(`${API_URL}/api/attributes/assign`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(assignForm)
       });
-
       if (res.ok) {
         alert('Атрибут прив\'язано до категорії!');
-        setAssignForm({
-          categoryId: '',
-          attributeId: '',
-          isRequired: false,
-          displayOrder: 0
-        });
+        setAssignForm({ categoryId: '', attributeId: '', isRequired: false, displayOrder: 0 });
         fetchAttributes();
       } else {
         const errorData = await res.json();
@@ -353,18 +289,14 @@ export default function AttributeManager() {
   };
 
   const handleUnassignFromCategory = async (categoryId, attributeId) => {
-    if (!window.confirm('Ви впевнені, що хочете відв\'язати цей атрибут від категорії?')) {
-      return;
-    }
-
+    if (!window.confirm('Ви впевнені, що хочете відв\'язати цей атрибут від категорії?')) return;
     try {
-      const res = await fetch(`http://localhost:3001/api/attributes/unassign`, {
+      const res = await fetch(`${API_URL}/api/attributes/unassign`, {
         method: 'DELETE',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ categoryId, attributeId })
       });
-
       if (res.ok) {
         alert('Атрибут відв\'язано від категорії!');
         fetchAttributes();
@@ -376,6 +308,7 @@ export default function AttributeManager() {
       alert('Помилка відв\'язування');
     }
   };
+
 
   const flattenCategories = (categories, level = 0, result = []) => {
     categories.forEach(category => {

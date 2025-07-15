@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './BannerManager.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const BannerManager = () => {
   const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,14 +25,14 @@ const BannerManager = () => {
   const fetchSlides = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/api/banner/cms', {
-        credentials: 'include' 
+      const response = await fetch(`${API_URL}/api/banner/cms`, {
+        credentials: 'include'
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch banner slides');
       }
-      
+
       const data = await response.json();
       setSlides(data);
       setLoading(false);
@@ -95,6 +97,7 @@ const BannerManager = () => {
     setEditMode(true);
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -111,24 +114,17 @@ const BannerManager = () => {
       }
 
       let response;
-      
-      if (editMode && currentSlide) {
-        response = await fetch(`http://localhost:3001/api/banner/cms/${currentSlide.id}`, {
-          method: 'PUT',
-          credentials: 'include',
-          body: formDataObj
-        });
-      } else {
-        response = await fetch('http://localhost:3001/api/banner/cms', {
-          method: 'POST',
-          credentials: 'include',
-          body: formDataObj
-        });
-      }
+      const url = editMode && currentSlide
+        ? `${API_URL}/api/banner/cms/${currentSlide.id}`
+        : `${API_URL}/api/banner/cms`;
 
-      if (!response.ok) {
-        throw new Error('Failed to save banner slide');
-      }
+      response = await fetch(url, {
+        method: editMode && currentSlide ? 'PUT' : 'POST',
+        credentials: 'include',
+        body: formDataObj
+      });
+
+      if (!response.ok) throw new Error('Failed to save banner slide');
 
       await fetchSlides();
       resetForm();
@@ -138,27 +134,19 @@ const BannerManager = () => {
     }
   };
 
-
   const handleDeleteSlide = async (slideId) => {
-    if (!window.confirm('Are you sure you want to delete this slide?')) {
-      return;
-    }
-    
+    if (!window.confirm('Are you sure you want to delete this slide?')) return;
+
     try {
-      const response = await fetch(`http://localhost:3001/api/banner/cms/${slideId}`, {
+      const response = await fetch(`${API_URL}/api/banner/cms/${slideId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete banner slide');
-      }
-      
+
+      if (!response.ok) throw new Error('Failed to delete banner slide');
+
       await fetchSlides();
-      
-      if (currentSlide && currentSlide.id === slideId) {
-        resetForm();
-      }
+      if (currentSlide?.id === slideId) resetForm();
     } catch (err) {
       console.error('Error deleting banner slide:', err);
       setError('Failed to delete banner slide');
@@ -168,41 +156,32 @@ const BannerManager = () => {
   const handleMoveSlide = async (slideId, direction) => {
     const slideIndex = slides.findIndex(slide => slide.id === slideId);
     if (
-      (direction === 'up' && slideIndex === 0) || 
+      (direction === 'up' && slideIndex === 0) ||
       (direction === 'down' && slideIndex === slides.length - 1)
-    ) {
-      return; 
-    }
-    
+    ) return;
+
     const newSlides = [...slides];
     const newIndex = direction === 'up' ? slideIndex - 1 : slideIndex + 1;
-    
-
     [newSlides[slideIndex], newSlides[newIndex]] = [newSlides[newIndex], newSlides[slideIndex]];
     setSlides(newSlides);
-    
 
     try {
       const slideIds = newSlides.map(slide => slide.id);
-      
-      const response = await fetch('http://localhost:3001/api/banner/cms/reorder', {
+      const response = await fetch(`${API_URL}/api/banner/cms/reorder`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slideIds })
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to reorder slides');
-      }
+
+      if (!response.ok) throw new Error('Failed to reorder slides');
     } catch (err) {
       console.error('Error reordering slides:', err);
       setError('Failed to reorder slides');
       await fetchSlides();
     }
   };
+
 
   if (loading) {
     return <div className="loading">Loading banner slides...</div>;
