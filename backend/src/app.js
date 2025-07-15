@@ -11,7 +11,7 @@ const app = express();
 
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://demo-shop-chi.vercel.app', // замени на свой Vercel домен
+  'https://clothes-shop-3vlz.onrender.com', // замени на свой Vercel домен
   process.env.FRONTEND_URL // чтобы можно было задавать в .env
 ];
 
