@@ -1,6 +1,4 @@
 // ОНОВЛЕНИЙ App.js - чистий з page компонентами
-const API_URL = process.env.REACT_APP_API_URL;
-
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
@@ -15,6 +13,8 @@ import Banner from './components/MainPage/Banner';
 // ІМПОРТ СТОРІНОК
 import HomePage from './components/pages/HomePage';
 import CatalogPage from './components/pages/CatalogPage';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 class App extends React.Component {
   constructor(props) {
