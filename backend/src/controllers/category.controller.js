@@ -1,3 +1,5 @@
+//category.controller.js
+
 const prisma = require('../config/prisma.client.js');
 const memoizeAsync = require('../services/memorization');
 

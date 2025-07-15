@@ -1,3 +1,5 @@
+//ProductTable.js
+
 import React, { useState, useEffect, useCallback } from 'react';
 import './ProductsTable.css';
 import AdvancedFilterComponent from './AdvancedFilterComponent';
@@ -12,8 +14,12 @@ export default function ProductsTable() {
   const [tempProduct, setTempProduct] = useState({});
   const [tempAttributes, setTempAttributes] = useState({});
   const [categoryAttributes, setCategoryAttributes] = useState([]);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  
+  // НОВІ СТАНИ ДЛЯ МНОЖИННИХ ЗОБРАЖЕНЬ
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
+  const [imagesToDelete, setImagesToDelete] = useState([]);
   
   // Фільтри
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
@@ -145,7 +151,6 @@ export default function ProductsTable() {
   const startEditing = async (product) => {
     setEditingProduct(product.id);
     setTempProduct({ ...product });
-    setImagePreview(product.image);
     
     // Підготовка атрибутів для редагування з поточними значеннями
     const attributesObj = {};
@@ -164,6 +169,12 @@ export default function ProductsTable() {
     }
     setTempAttributes(attributesObj);
     
+    // НОВЕ: Підготовка існуючих зображень
+    setExistingImages(product.images || []);
+    setImageFiles([]);
+    setImagePreviews([]);
+    setImagesToDelete([]);
+    
     // Завантажуємо атрибути категорії (включаючи батьківські)
     if (product.categoryId) {
       await fetchCategoryAttributes(product.categoryId);
@@ -175,8 +186,10 @@ export default function ProductsTable() {
     setTempProduct({});
     setTempAttributes({});
     setCategoryAttributes([]);
-    setImageFile(null);
-    setImagePreview(null);
+    setImageFiles([]);
+    setImagePreviews([]);
+    setExistingImages([]);
+    setImagesToDelete([]);
   };
 
   const handleChange = async (e) => {
@@ -216,57 +229,103 @@ export default function ProductsTable() {
     });
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
+  // НОВІ ФУНКЦІЇ ДЛЯ РОБОТИ З МНОЖИННИМИ ЗОБРАЖЕННЯМИ
+  const handleMultipleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      setImageFiles(prev => [...prev, ...files]);
+      
+      // Створюємо preview для нових файлів
+      const newPreviews = files.map(file => ({
+        file,
+        url: URL.createObjectURL(file),
+        isNew: true
+      }));
+      
+      setImagePreviews(prev => [...prev, ...newPreviews]);
     }
   };
 
-  const uploadImage = async () => {
-    if (!imageFile) return null;
-    
-    const formData = new FormData();
-    formData.append('image', imageFile);
-    
-    try {
-      const res = await fetch('http://localhost:3001/api/products/upload', {
-        method: 'POST',
-        credentials: 'include',
-        body: formData
-      });
-      
-      if (!res.ok) {
-        throw new Error('Image upload failed');
+  const removeNewImage = (index) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => {
+      const newPreviews = prev.filter((_, i) => i !== index);
+      // Очищаємо URL для звільнення пам'яті
+      if (prev[index]) {
+        URL.revokeObjectURL(prev[index].url);
       }
-      
-      const data = await res.json();
-      return data.url;
-    } catch (err) {
-      console.error("Error uploading image:", err);
-      alert('Failed to upload image');
-      return null;
+      return newPreviews;
+    });
+  };
+
+  const removeExistingImage = (imageId) => {
+    setImagesToDelete(prev => [...prev, imageId]);
+    setExistingImages(prev => prev.filter(img => img.id !== imageId));
+  };
+
+  const setMainImage = (imageId, isExisting = true) => {
+    if (isExisting) {
+      setExistingImages(prev => prev.map(img => ({
+        ...img,
+        isMain: img.id === imageId
+      })));
+    } else {
+      setImagePreviews(prev => prev.map((preview, index) => ({
+        ...preview,
+        isMain: index === imageId
+      })));
     }
+  };
+
+  const uploadImages = async () => {
+    if (imageFiles.length === 0) return [];
+    
+    const uploadedUrls = [];
+    
+    for (const file of imageFiles) {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      try {
+        const res = await fetch('http://localhost:3001/api/products/upload', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData
+        });
+        
+        if (!res.ok) {
+          throw new Error('Image upload failed');
+        }
+        
+        const data = await res.json();
+        uploadedUrls.push(data.url);
+      } catch (err) {
+        console.error("Error uploading image:", err);
+        alert('Failed to upload image: ' + file.name);
+        return null;
+      }
+    }
+    
+    return uploadedUrls;
   };
 
   const saveProduct = async () => {
     try {
-      let imageUrl = tempProduct.image;
+      // Завантажуємо нові зображення
+      const uploadedImageUrls = await uploadImages();
+      if (uploadedImageUrls === null) return; // Помилка завантаження
       
-      if (imageFile) {
-        const newImageUrl = await uploadImage();
-        if (newImageUrl) {
-          imageUrl = newImageUrl;
-        } else {
-          return;
-        }
-      }
+      // Підготовуємо дані про зображення
+      const imageData = {
+        newImages: uploadedImageUrls,
+        existingImages: existingImages,
+        imagesToDelete: imagesToDelete
+      };
       
       const updatedProduct = {
         ...tempProduct,
-        image: imageUrl,
-        attributes: tempAttributes
+        attributes: tempAttributes,
+        images: imageData
       };
       
       const res = await fetch(`http://localhost:3001/api/products/${tempProduct.id}`, {
@@ -339,6 +398,27 @@ export default function ProductsTable() {
             +{product.attributes.length - 3} more...
           </div>
         )}
+      </div>
+    );
+  };
+
+  // НОВЕ: Відображення швидких характеристик
+  const renderQuickSpecs = (product) => {
+    const specs = [];
+    if (product.mileage) specs.push(`🚗 ${product.mileage}`);
+    if (product.transmission) specs.push(`⚙️ ${product.transmission}`);
+    if (product.wheelbase) specs.push(`🚛 ${product.wheelbase}`);
+    if (product.fuelType) specs.push(`⛽ ${product.fuelType}`);
+    
+    if (specs.length === 0) {
+      return <span style={{ color: '#999', fontStyle: 'italic' }}>No quick specs</span>;
+    }
+    
+    return (
+      <div style={{ fontSize: '11px', lineHeight: '1.3' }}>
+        {specs.map((spec, index) => (
+          <div key={index}>{spec}</div>
+        ))}
       </div>
     );
   };
@@ -441,6 +521,220 @@ export default function ProductsTable() {
     );
   };
 
+  // НОВЕ: Форма редагування швидких характеристик
+  const renderQuickSpecsEditForm = () => {
+    return (
+      <div style={{ 
+        padding: '10px', 
+        backgroundColor: '#f0f8ff', 
+        borderRadius: '4px',
+        marginBottom: '10px'
+      }}>
+        <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '12px', color: '#2c5aa0' }}>
+          Quick Specs:
+        </div>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: '500' }}>
+              Mileage:
+            </label>
+            <input
+              type="text"
+              name="mileage"
+              value={tempProduct.mileage || ''}
+              onChange={handleChange}
+              placeholder="e.g. 127 тис. км"
+              style={{ width: '100%', padding: '4px', fontSize: '11px' }}
+            />
+          </div>
+          
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: '500' }}>
+              Transmission:
+            </label>
+            <select
+              name="transmission"
+              value={tempProduct.transmission || ''}
+              onChange={handleChange}
+              style={{ width: '100%', padding: '4px', fontSize: '11px' }}
+            >
+              <option value="">Select type</option>
+              <option value="Автомат">Автомат</option>
+              <option value="Механіка">Механіка</option>
+              <option value="Робот">Робот</option>
+              <option value="Варіатор">Варіатор</option>
+            </select>
+          </div>
+          
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: '500' }}>
+              Wheelbase:
+            </label>
+            <input
+              type="text"
+              name="wheelbase"
+              value={tempProduct.wheelbase || ''}
+              onChange={handleChange}
+              placeholder="e.g. 4x2, 6x4"
+              style={{ width: '100%', padding: '4px', fontSize: '11px' }}
+            />
+          </div>
+          
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: '500' }}>
+              Fuel Type:
+            </label>
+            <select
+              name="fuelType"
+              value={tempProduct.fuelType || ''}
+              onChange={handleChange}
+              style={{ width: '100%', padding: '4px', fontSize: '11px' }}
+            >
+              <option value="">Select type</option>
+              <option value="Дизель">Дизель</option>
+              <option value="Бензин">Бензин</option>
+              <option value="Газ">Газ</option>
+              <option value="Електро">Електро</option>
+              <option value="Гібрид">Гібрид</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // НОВЕ: Форма редагування зображень
+  const renderImageEditForm = () => {
+    return (
+      <div style={{ 
+        padding: '10px', 
+        backgroundColor: '#fff5f5', 
+        borderRadius: '4px',
+        marginBottom: '10px'
+      }}>
+        <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '12px', color: '#dc3545' }}>
+          Images:
+        </div>
+        
+        {/* Існуючі зображення */}
+        {existingImages.length > 0 && (
+          <div style={{ marginBottom: '10px' }}>
+            <div style={{ fontSize: '11px', marginBottom: '5px' }}>Existing Images:</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+              {existingImages.map(img => (
+                <div key={img.id} style={{ position: 'relative', border: img.isMain ? '2px solid #007bff' : '1px solid #ddd', borderRadius: '4px' }}>
+                  <img 
+                    src={img.imageUrl} 
+                    alt="Product" 
+                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
+                  />
+                  <button
+                    onClick={() => removeExistingImage(img.id)}
+                    style={{ 
+                      position: 'absolute', 
+                      top: '-5px', 
+                      right: '-5px', 
+                      width: '20px', 
+                      height: '20px', 
+                      borderRadius: '50%', 
+                      background: '#dc3545', 
+                      color: 'white', 
+                      border: 'none', 
+                      fontSize: '12px', 
+                      cursor: 'pointer' 
+                    }}
+                  >
+                    ×
+                  </button>
+                  <button
+                    onClick={() => setMainImage(img.id, true)}
+                    style={{ 
+                      position: 'absolute', 
+                      bottom: '-5px', 
+                      left: '-5px', 
+                      padding: '2px 4px', 
+                      fontSize: '8px', 
+                      background: img.isMain ? '#007bff' : '#6c757d', 
+                      color: 'white', 
+                      border: 'none', 
+                      borderRadius: '3px', 
+                      cursor: 'pointer' 
+                    }}
+                  >
+                    {img.isMain ? 'MAIN' : 'SET MAIN'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Нові зображення для завантаження */}
+        {imagePreviews.length > 0 && (
+          <div style={{ marginBottom: '10px' }}>
+            <div style={{ fontSize: '11px', marginBottom: '5px' }}>New Images to Upload:</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+              {imagePreviews.map((preview, index) => (
+                <div key={index} style={{ position: 'relative', border: preview.isMain ? '2px solid #28a745' : '1px solid #ddd', borderRadius: '4px' }}>
+                  <img 
+                    src={preview.url} 
+                    alt="Preview" 
+                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
+                  />
+                  <button
+                    onClick={() => removeNewImage(index)}
+                    style={{ 
+                      position: 'absolute', 
+                      top: '-5px', 
+                      right: '-5px', 
+                      width: '20px', 
+                      height: '20px', 
+                      borderRadius: '50%', 
+                      background: '#dc3545', 
+                      color: 'white', 
+                      border: 'none', 
+                      fontSize: '12px', 
+                      cursor: 'pointer' 
+                    }}
+                  >
+                    ×
+                  </button>
+                  <button
+                    onClick={() => setMainImage(index, false)}
+                    style={{ 
+                      position: 'absolute', 
+                      bottom: '-5px', 
+                      left: '-5px', 
+                      padding: '2px 4px', 
+                      fontSize: '8px', 
+                      background: preview.isMain ? '#28a745' : '#6c757d', 
+                      color: 'white', 
+                      border: 'none', 
+                      borderRadius: '3px', 
+                      cursor: 'pointer' 
+                    }}
+                  >
+                    {preview.isMain ? 'MAIN' : 'SET MAIN'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Кнопка додавання нових зображень */}
+        <input 
+          type="file" 
+          accept="image/*" 
+          multiple
+          onChange={handleMultipleFileChange} 
+          style={{ fontSize: '11px', width: '100%' }}
+        />
+      </div>
+    );
+  };
+
   const changePage = (newPage) => {
     setPagination(prev => ({ ...prev, page: newPage }));
   };
@@ -487,11 +781,12 @@ export default function ProductsTable() {
           <table className="products-table">
             <thead>
               <tr>
-                <th>Image</th>
+                <th>Images</th>
                 <th>Title</th>
                 <th>Description</th>
                 <th>Price</th>
                 <th>Category</th>
+                <th>Quick Specs</th>
                 <th>Attributes</th>
                 <th>Actions</th>
               </tr>
@@ -499,7 +794,7 @@ export default function ProductsTable() {
             <tbody>
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="no-products">
+                  <td colSpan="8" className="no-products">
                     No products found
                   </td>
                 </tr>
@@ -508,25 +803,54 @@ export default function ProductsTable() {
                   <tr key={product.id} className={editingProduct === product.id ? 'editing' : ''}>
                     <td className="product-image-cell">
                       {editingProduct === product.id ? (
-                        <div className="image-upload">
-                          <img 
-                            src={imagePreview || product.image} 
-                            alt={tempProduct.title} 
-                            className="product-image-preview" 
-                          />
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            onChange={handleFileChange} 
-                            className="image-input"
-                          />
-                        </div>
+                        renderImageEditForm()
                       ) : (
-                        <img 
-                          src={product.image} 
-                          alt={product.title} 
-                          className="product-image" 
-                        />
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px', maxWidth: '120px' }}>
+                          {product.images && product.images.length > 0 ? 
+                            product.images.slice(0, 4).map((img, index) => (
+                              <img 
+                                key={img.id || index}
+                                src={img.imageUrl || img}
+                                alt={product.title} 
+                                style={{ 
+                                  width: index === 0 ? '60px' : '28px', 
+                                  height: index === 0 ? '60px' : '28px', 
+                                  objectFit: 'cover', 
+                                  borderRadius: '4px',
+                                  border: img.isMain ? '2px solid #007bff' : '1px solid #ddd'
+                                }}
+                              />
+                            )) : 
+                            <div style={{ 
+                              width: '60px', 
+                              height: '60px', 
+                              backgroundColor: '#f8f9fa', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              borderRadius: '4px',
+                              fontSize: '10px',
+                              color: '#666'
+                            }}>
+                              No Image
+                            </div>
+                          }
+                          {product.images && product.images.length > 4 && (
+                            <div style={{ 
+                              width: '28px', 
+                              height: '28px', 
+                              backgroundColor: '#007bff', 
+                              color: 'white', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              borderRadius: '4px',
+                              fontSize: '10px'
+                            }}>
+                              +{product.images.length - 4}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </td>
                     <td>
@@ -565,7 +889,7 @@ export default function ProductsTable() {
                           className="edit-input price-input"
                         />
                       ) : (
-                        `$${product.price.toFixed(2)}`
+                        `${product.price.toFixed(2)}`
                       )}
                     </td>
                     <td>
@@ -585,6 +909,13 @@ export default function ProductsTable() {
                         </select>
                       ) : (
                         product.categoryId ? getCategoryName(product.categoryId) : 'Uncategorized'
+                      )}
+                    </td>
+                    <td className="quick-specs-cell">
+                      {editingProduct === product.id ? (
+                        renderQuickSpecsEditForm()
+                      ) : (
+                        renderQuickSpecs(product)
                       )}
                     </td>
                     <td className="attributes-cell">

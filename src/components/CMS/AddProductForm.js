@@ -11,8 +11,18 @@ export default function AddProductForm() {
   const [categories, setCategories] = useState([]);
   const [categoryAttributes, setCategoryAttributes] = useState([]);
   const [attributeValues, setAttributeValues] = useState({});
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
+  
+  // НОВІ СТАНИ ДЛЯ МНОЖИННИХ ЗОБРАЖЕНЬ
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [mainImageIndex, setMainImageIndex] = useState(0);
+  
+  // НОВІ ПОЛЯ ДЛЯ ШВИДКИХ ХАРАКТЕРИСТИК
+  const [mileage, setMileage] = useState('');
+  const [transmission, setTransmission] = useState('');
+  const [wheelbase, setWheelbase] = useState('');
+  const [fuelType, setFuelType] = useState('');
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -60,7 +70,6 @@ export default function AddProductForm() {
       const data = await res.json();
       setCategoryAttributes(data);
       
-      // Очищаємо попередні значення атрибутів
       setAttributeValues({});
     } catch (err) {
       console.error("Error fetching category attributes:", err);
@@ -68,19 +77,44 @@ export default function AddProductForm() {
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
+  // НОВІ ФУНКЦІЇ ДЛЯ РОБОТИ З МНОЖИННИМИ ЗОБРАЖЕННЯМИ
+  const handleMultipleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      setImageFiles(prev => [...prev, ...files]);
+      
+      // Створюємо preview для нових файлів
+      const newPreviews = files.map(file => URL.createObjectURL(file));
+      setImagePreviews(prev => [...prev, ...newPreviews]);
+      
+      // Якщо це перші зображення, встановлюємо перше як головне
+      if (imageFiles.length === 0) {
+        setMainImageIndex(0);
+      }
     }
   };
 
-  const handleRemoveImage = () => {
-    setImage(null);
-    setPreview(null);
-    const fileInput = document.getElementById('productImage');
-    if (fileInput) fileInput.value = '';
+  const removeImage = (index) => {
+    // Видаляємо файл та preview
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    
+    // Очищаємо URL для звільнення пам'яті
+    if (imagePreviews[index]) {
+      URL.revokeObjectURL(imagePreviews[index]);
+    }
+    
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    
+    // Коригуємо індекс головного зображення
+    if (mainImageIndex === index) {
+      setMainImageIndex(0); // Встановлюємо перше як головне
+    } else if (mainImageIndex > index) {
+      setMainImageIndex(prev => prev - 1);
+    }
+  };
+
+  const setMainImage = (index) => {
+    setMainImageIndex(index);
   };
 
   const handleAttributeChange = (attributeSlug, value) => {
@@ -177,7 +211,7 @@ export default function AddProductForm() {
                 handleAttributeChange(attr.slug, `${e.target.value},${max || ''}`);
               }}
               placeholder="Від"
-              className="range-input"
+              className="cms-range-input"
             />
             <input
               type="number"
@@ -188,7 +222,7 @@ export default function AddProductForm() {
                 handleAttributeChange(attr.slug, `${min || ''},${e.target.value}`);
               }}
               placeholder="До"
-              className="range-input"
+              className="cms-range-input"
             />
           </div>
         );
@@ -196,6 +230,37 @@ export default function AddProductForm() {
       default:
         return null;
     }
+  };
+
+  const uploadImages = async () => {
+    if (imageFiles.length === 0) return [];
+    
+    const uploadedUrls = [];
+    
+    for (const file of imageFiles) {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      try {
+        const uploadRes = await fetch('http://localhost:3001/api/products/upload', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData,
+        });
+        
+        if (!uploadRes.ok) {
+          throw new Error('Image upload failed');
+        }
+        
+        const uploadData = await uploadRes.json();
+        uploadedUrls.push(uploadData.url);
+      } catch (err) {
+        console.error("Error uploading image:", err);
+        throw new Error(`Failed to upload image: ${file.name}`);
+      }
+    }
+    
+    return uploadedUrls;
   };
 
   const handleSubmit = async (e) => {
@@ -213,33 +278,31 @@ export default function AddProductForm() {
         }
       }
 
-      let imageUrl = null;
-      
-      if (image) {
-        const formData = new FormData();
-        formData.append('image', image);
+      // Завантажуємо всі зображення
+      let imageUrls = [];
+      if (imageFiles.length > 0) {
+        imageUrls = await uploadImages();
         
-        const uploadRes = await fetch('http://localhost:3001/api/products/upload', {
-          method: 'POST',
-          credentials: 'include',
-          body: formData,
-        });
-        
-        if (!uploadRes.ok) {
-          throw new Error('Image upload failed');
+        // Переставляємо головне зображення на перше місце
+        if (mainImageIndex > 0 && mainImageIndex < imageUrls.length) {
+          const mainImage = imageUrls[mainImageIndex];
+          imageUrls.splice(mainImageIndex, 1);
+          imageUrls.unshift(mainImage);
         }
-        
-        const uploadData = await uploadRes.json();
-        imageUrl = uploadData.url;
       }
       
       const productData = {
         title: title.trim(),
         description: description.trim(),
         price: parseFloat(price),
-        image: imageUrl,
+        images: imageUrls, // ВИКОРИСТОВУЄМО МНОЖИННІ ЗОБРАЖЕННЯ
         categoryId: parseInt(categoryId),
-        attributes: attributeValues
+        attributes: attributeValues,
+        // НОВІ ПОЛЯ
+        mileage: mileage.trim() || null,
+        transmission: transmission.trim() || null,
+        wheelbase: wheelbase.trim() || null,
+        fuelType: fuelType.trim() || null
       };
       
       const productRes = await fetch('http://localhost:3001/api/products', {
@@ -259,9 +322,18 @@ export default function AddProductForm() {
         setPrice('');
         setCategoryId('');
         setAttributeValues({});
-        setImage(null);
-        setPreview(null);
-        const fileInput = document.getElementById('productImage');
+        setMileage('');
+        setTransmission('');
+        setWheelbase('');
+        setFuelType('');
+        
+        // Очищаємо зображення
+        imagePreviews.forEach(url => URL.revokeObjectURL(url));
+        setImageFiles([]);
+        setImagePreviews([]);
+        setMainImageIndex(0);
+        
+        const fileInput = document.getElementById('productImages');
         if (fileInput) fileInput.value = '';
       } else {
         throw new Error(productResult.error || 'Failed to add product');
@@ -306,6 +378,61 @@ export default function AddProductForm() {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* НОВА СЕКЦІЯ - ШВИДКІ ХАРАКТЕРИСТИКИ */}
+        <div className="quick-specs-section">
+          <h3>Швидкі характеристики</h3>
+          <div className="quick-specs-grid">
+            <div className="form-group">
+              <label>Пробіг:</label>
+              <input
+                type="text"
+                value={mileage}
+                onChange={e => setMileage(e.target.value)}
+                placeholder="напр: 127 тис. км"
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Коробка передач:</label>
+              <select
+                value={transmission}
+                onChange={e => setTransmission(e.target.value)}
+              >
+                <option value="">Оберіть тип</option>
+                <option value="Автомат">Автомат</option>
+                <option value="Механіка">Механіка</option>
+                <option value="Робот">Робот</option>
+                <option value="Варіатор">Варіатор</option>
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Колісна база:</label>
+              <input
+                type="text"
+                value={wheelbase}
+                onChange={e => setWheelbase(e.target.value)}
+                placeholder="напр: 4x2, 6x4"
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Тип палива:</label>
+              <select
+                value={fuelType}
+                onChange={e => setFuelType(e.target.value)}
+              >
+                <option value="">Оберіть тип</option>
+                <option value="Дизель">Дизель</option>
+                <option value="Бензин">Бензин</option>
+                <option value="Газ">Газ</option>
+                <option value="Електро">Електро</option>
+                <option value="Гібрид">Гібрид</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Динамічні атрибути */}
@@ -353,37 +480,73 @@ export default function AddProductForm() {
           />
         </div>
         
-        <div className="form-group image-upload file-input-field">
-          <label>Product Image:</label>
-          <div className="file-input-container">
-            <input
-              type="file"
-              id="productImage"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="file-input"
-            />
-            <label htmlFor="productImage" className="file-input-label">
-              <span className="upload-icon">📷</span>
-              <span>Choose an image</span>
-            </label>
-          </div>
-        </div>
-        
-        {preview && (
-          <div className="image-preview-container">
-            <div className="image-preview">
-              <img src={preview} alt="Product preview" />
-              <button 
-                type="button" 
-                className="remove-image-btn"
-                onClick={handleRemoveImage}
-              >
-                🗑️
-              </button>
+        {/* НОВА СЕКЦІЯ - МНОЖИННІ ЗОБРАЖЕННЯ */}
+        <div className="images-section">
+          <h3>Зображення товару</h3>
+          
+          <div className="form-group image-upload file-input-field">
+            <label>Додати зображення:</label>
+            <div className="file-input-container">
+              <input
+                type="file"
+                id="productImages"
+                accept="image/*"
+                multiple
+                onChange={handleMultipleFileChange}
+                className="file-input"
+              />
+              <label htmlFor="productImages" className="file-input-label">
+                <span className="upload-icon">📷</span>
+                <span>Оберіть зображення (можна декілька)</span>
+              </label>
             </div>
           </div>
-        )}
+          
+          {/* Галерея завантажених зображень */}
+          {imagePreviews.length > 0 && (
+            <div className="images-gallery">
+              <h4>Завантажені зображення:</h4>
+              <div className="images-grid">
+                {imagePreviews.map((preview, index) => (
+                  <div 
+                    key={index} 
+                    className={`image-item ${mainImageIndex === index ? 'main' : ''}`}
+                  >
+                    <img src={preview} alt={`Preview ${index + 1}`} className="image-preview" />
+                    
+                    {/* Кнопка видалення */}
+                    <button 
+                      type="button" 
+                      className="remove-image-btn"
+                      onClick={() => removeImage(index)}
+                      title="Видалити зображення"
+                    >
+                      🗑️
+                    </button>
+                    
+                    {/* Кнопка встановлення головного зображення */}
+                    <button
+                      type="button"
+                      className={`main-image-btn ${mainImageIndex === index ? 'active' : ''}`}
+                      onClick={() => setMainImage(index)}
+                      title={mainImageIndex === index ? 'Головне зображення' : 'Зробити головним'}
+                    >
+                      {mainImageIndex === index ? '★' : '☆'}
+                    </button>
+                    
+                    {/* Позначка головного зображення */}
+                    {mainImageIndex === index && (
+                      <div className="main-image-badge">ГОЛОВНЕ</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="images-hint">
+                ★ Головне зображення буде показано першим. Клікніть на ☆ щоб змінити головне зображення.
+              </p>
+            </div>
+          )}
+        </div>
         
         {error && <div className="error-message">{error}</div>}
         
